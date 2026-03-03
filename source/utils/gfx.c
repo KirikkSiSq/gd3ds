@@ -212,9 +212,9 @@ void reinitialize_screens() {
 }
 
 void set_wide(bool wide) {
-	u8 isNot2DS;
-	CFGU_GetModelNintendo2DS(&isNot2DS);
-	if (!isNot2DS && !is_citra()) {
+	u8 model;
+	CFGU_GetSystemModel(&model);
+	if (model != CFG_MODEL_2DS && !is_citra()) {
 		wideEnabled = wide;
 		gfxSetWide(wide);	
 	}
