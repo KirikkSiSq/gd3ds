@@ -9,7 +9,7 @@ Geometry Dash and its respective resources are by RobTop Games.
 * Epic level select menu.
 
 ## Download
-You can download the .3dsx file for Homebrew Launcher here: [3dsx version](https://nightly.link/AleFunky/gd3ds/workflows/main/master/gd3ds-3dsx.zip)
+You can download the .3dsx file for Homebrew Launcher here: [3dsx version](https://nightly.link/AleFunky/gd3ds/workflows/main/master/gd3ds-3dsx.zip)\
 If you prefer having it in your home menu you can download the cia here: [cia version](https://nightly.link/AleFunky/gd3ds/workflows/main/master/gd3ds-cia.zip)
 
 # Discord
