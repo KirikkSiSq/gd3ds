@@ -16,6 +16,7 @@ jobs:
           submodules: recursive
       - name: Make application
         run: |
+          chmod -R 755 buildtools/
           make 3dsx cia
       - name: Prepare for build publishing
         run: |
