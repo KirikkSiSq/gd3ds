@@ -52,7 +52,7 @@ static C2D_SpriteSheet *get_sprite_sheet(int index, int *rel_index) {
 	return &spriteSheet2;
 }
 
-static void spawn_sprite_c2d(
+static inline void spawn_sprite_c2d(
     C2D_Sprite *out,
     C2D_SpriteSheet *sheet,
     int texture,
@@ -64,10 +64,10 @@ static void spawn_sprite_c2d(
     C2D_SpriteSetCenter(out, 0.5f, 0.5f);
     C2D_SpriteSetPos(out, (int)x, (int)y);
     C2D_SpriteSetScale(out, scale_x, scale_y);
-    C2D_SpriteSetRotation(out, C3D_AngleFromDegrees(rotation));
+    C2D_SpriteSetRotation(out, rotation);
 }
 
-int get_color_channel(int col_type, Object *obj, const GameObject *game_obj) {
+inline int get_color_channel(int col_type, Object *obj, const GameObject *game_obj) {
 	int col_channel = 0;
 	if (col_type == COLOR_TYPE_BLACK) col_channel = 0;
 	else if (col_type == COLOR_TYPE_WHITE) col_channel = -1;
@@ -160,7 +160,7 @@ void spawn_object_at(
 			p_y,
 			sx, 
 			sy,
-			deg
+			rad
 		);
 		
 		SpriteObject *vo = &viewable_objects[sprite_count];
@@ -206,7 +206,7 @@ void spawn_object_at(
 				c_y,
 				c->scale_x * c_flip_x_mult * sx,
 				c->scale_y * c_flip_y_mult * sy,
-				c->rot + deg
+				C3D_AngleFromDegrees(c->rot) + rad
 			);
 				
 			SpriteObject *vo = &viewable_objects[sprite_count];

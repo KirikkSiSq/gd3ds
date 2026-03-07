@@ -190,7 +190,7 @@ bool handle_fading() {
 }
 
 void draw_fade() {
-    C2D_Fade(C2D_Color32(0, 0, 0, (int) opacity));
+    if (opacity) C2D_Fade(C2D_Color32(0, 0, 0, (int) opacity));
 }
 
 void set_fade_status(int status) {
