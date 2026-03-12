@@ -16,7 +16,8 @@ typedef enum {
     UI_TEXTBOX,
     UI_LIST,
     UI_ACTION_AREA,
-    UI_DARKEN
+    UI_DARKEN,
+    UI_ICON,
 } UIElementType;
 
 typedef struct {
@@ -92,6 +93,26 @@ typedef struct {
 } UIInput;
 
 typedef struct {
+    int gamemode;
+    int index;
+
+    UIImageData image;
+
+    bool hovered;
+    bool pressed;
+    
+    float hoverTimer;
+    float hoverScale;
+
+    float scaleX;
+    float scaleY;
+
+    bool isSelected;
+
+    char text[64];
+} UIIconData;
+
+typedef struct {
     C2D_Sprite sprite;
     C2D_ImageTint tint;
     float opacity;
@@ -134,6 +155,7 @@ struct UIElement {
         UIList list;
         UIActionAreaData action_area;
         UIDarken darken;
+        UIIconData icon;
     };
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH];

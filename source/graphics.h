@@ -99,5 +99,8 @@ void spawn_icon_at(
 	float deg,
 	unsigned char flip_x,
 	unsigned char flip_y,
-	float scale
+	float scale,
+	u32 p1_color,
+	u32 p2_color,
+	u32 glow_color
 );

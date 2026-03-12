@@ -11,6 +11,7 @@
 #include "ui_bg_gradient.h"
 #include "ui_action_area.h"
 #include "ui_darken.h"
+#include "ui_icon.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -276,6 +277,8 @@ void ui_load_screen(UIScreen* screen,
         int limit = 16;
         float opacity = 1.0f;
 
+        int index = 1, gamemode = 0;
+
         // Some strings
         char actionName[64] = {0};
         char text[256] = {0};
@@ -344,6 +347,10 @@ void ui_load_screen(UIScreen* screen,
                 limit = atoi(value);
             } else if (strcmp(key, "opacity") == 0) {
                 opacity = atof(value);
+            } else if (strcmp(key, "index") == 0) {
+                index = atoi(value);
+            } else if (strcmp(key, "gamemode") == 0) {
+                gamemode = atoi(value);
             }
         }
 
@@ -407,6 +414,13 @@ void ui_load_screen(UIScreen* screen,
             screen->elements[screen->count++] =
                 ui_create_darken(
                     opacity, tag
+                );
+        } else if (strcmp(type, "icon") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_icon(
+                    x, y, scale, index, gamemode,
+                    ui_find_action(actions, actionCount, actionName),
+                    tag
                 );
         }
     }

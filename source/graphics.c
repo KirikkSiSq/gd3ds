@@ -922,7 +922,10 @@ void spawn_icon_at(
 	float deg,
 	unsigned char flip_x,
 	unsigned char flip_y,
-	float scale
+	float scale,
+	u32 p1_color,
+	u32 p2_color,
+	u32 glow_color
 ) {
 	const Icon icon = icons[gamemode][id];
 	const IconPart *parts = icon.parts;
@@ -954,9 +957,9 @@ void spawn_icon_at(
 
 	if (!glow) count--;
 
-	C2D_PlainImageTint(&tints[0], C2D_Color32(p1_color.r, p1_color.g, p1_color.b, 255), 1.0f);
-	C2D_PlainImageTint(&tints[1], C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255), 1.0f);
-	C2D_PlainImageTint(&tints[icon.part_count - 1], C2D_Color32(p2_color.r, p2_color.g, p2_color.b, 255), 1.0f);
+	C2D_PlainImageTint(&tints[0], p1_color, 1.0f);
+	C2D_PlainImageTint(&tints[1], p2_color, 1.0f);
+	C2D_PlainImageTint(&tints[icon.part_count - 1], glow_color, 1.0f);
 
 	for (size_t i = 0; i < count - glow; i++) {
 		size_t real_index = i;
