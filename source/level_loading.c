@@ -809,26 +809,26 @@ int parse_gd_object(const char *objStr, int obj) {
     if (hitbox) {
         objects.width[obj] = hitbox->width;
         objects.height[obj] = hitbox->height;
-    }
-
-    if (hitbox->type == COLLISION_SLOPE) {
-        int orientation = objects.rotation[obj] / 90;
-        if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
-        else if (objects.flippedH[obj]) orientation += 1;
-        else if (objects.flippedV[obj]) orientation += 3;
         
-        orientation = orientation % 4;
-        if (orientation < 0) orientation += 4;
+        if (hitbox->type == COLLISION_SLOPE) {
+            int orientation = objects.rotation[obj] / 90;
+            if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
+            else if (objects.flippedH[obj]) orientation += 1;
+            else if (objects.flippedV[obj]) orientation += 3;
+            
+            orientation = orientation % 4;
+            if (orientation < 0) orientation += 4;
 
-        objects.orientation[obj] = orientation;
+            objects.orientation[obj] = orientation;
 
-        // Modify height and width depending on rotation
-        if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
-            objects.width[obj] = hitbox->height;
-            objects.height[obj] = hitbox->width;
-        } else {
-            objects.width[obj] = hitbox->width;
-            objects.height[obj] = hitbox->height;
+            // Modify height and width depending on rotation
+            if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
+                objects.width[obj] = hitbox->height;
+                objects.height[obj] = hitbox->width;
+            } else {
+                objects.width[obj] = hitbox->width;
+                objects.height[obj] = hitbox->height;
+            }
         }
     }
 

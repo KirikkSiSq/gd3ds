@@ -2,6 +2,7 @@
 #include <string.h>
 #include "main.h"
 #include "math_helpers.h"
+#include "player/slope.h"
 
 GameState state;
 
@@ -144,6 +145,7 @@ void init_variables() {
     state.intended_mirror_factor = 0;
     state.intended_mirror_speed_factor = 1.f;
 
+
     //current_fading_effect = FADE_NONE;
     //p1_trail = FALSE;
     //death_timer = 0.f;
@@ -159,6 +161,7 @@ void init_variables() {
     state.mirror_mult = 1;
 
     Player *player = &state.player;
+    clear_slope_data(player);
     player->cutscene_timer = 0;
     player->width = 30;
     player->height = 30;
