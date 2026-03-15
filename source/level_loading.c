@@ -811,6 +811,27 @@ int parse_gd_object(const char *objStr, int obj) {
         objects.height[obj] = hitbox->height;
     }
 
+    if (hitbox->type == COLLISION_SLOPE) {
+        int orientation = objects.rotation[obj] / 90;
+        if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
+        else if (objects.flippedH[obj]) orientation += 1;
+        else if (objects.flippedV[obj]) orientation += 3;
+        
+        orientation = orientation % 4;
+        if (orientation < 0) orientation += 4;
+
+        objects.orientation[obj] = orientation;
+
+        // Modify height and width depending on rotation
+        if ((int) fabsf(objects.rotation[obj]) % 180 != 0) {
+            objects.width[obj] = hitbox->height;
+            objects.height[obj] = hitbox->width;
+        } else {
+            objects.width[obj] = hitbox->width;
+            objects.height[obj] = hitbox->height;
+        }
+    }
+
     free_string_array(tokens, count);
     return 1;
 }
@@ -830,10 +851,12 @@ void free_arrays() {
     if (objects.col_channel)        { free(objects.col_channel);        objects.col_channel = NULL; }
     if (objects.detail_col_channel) { free(objects.detail_col_channel); objects.detail_col_channel = NULL; }
     if (objects.target_color_id)    { free(objects.target_color_id);    objects.target_color_id = NULL; }
+    if (objects.hitbox_counter)     { free(objects.hitbox_counter);     objects.hitbox_counter = NULL; }
     if (objects.transition_applied) { free(objects.transition_applied); objects.transition_applied = NULL; }
     if (objects.trig_colorR)        { free(objects.trig_colorR);        objects.trig_colorR = NULL; }
     if (objects.trig_colorG)        { free(objects.trig_colorG);        objects.trig_colorG = NULL; }
     if (objects.trig_colorB)        { free(objects.trig_colorB);        objects.trig_colorB = NULL; }
+    if (objects.orientation)        { free(objects.orientation);        objects.orientation = NULL; }
     if (objects.tintGround)         { free(objects.tintGround);         objects.tintGround = NULL; }
     if (objects.p1_color)           { free(objects.p1_color);           objects.p1_color = NULL; }
     if (objects.p2_color)           { free(objects.p2_color);           objects.p2_color = NULL; }
@@ -842,6 +865,7 @@ void free_arrays() {
     if (objects.flippedH)           { free(objects.flippedH);           objects.flippedH = NULL; }
     if (objects.flippedV)           { free(objects.flippedV);           objects.flippedV = NULL; }
     if (objects.activated)          { free(objects.activated);          objects.activated = NULL; }
+    if (objects.collided)           { free(objects.collided);           objects.collided = NULL; }
 }
 
 bool init_arrays(int count) {
@@ -886,6 +910,9 @@ bool init_arrays(int count) {
     
     objects.target_color_id = malloc(sizeof(unsigned short) * count);
     if (!objects.target_color_id) return false;
+    
+    objects.hitbox_counter = malloc(sizeof(unsigned short) * count);
+    if (!objects.hitbox_counter) return false;
 
     objects.transition_applied = malloc(sizeof(unsigned char) * count);
     if (!objects.transition_applied) return false;
@@ -898,6 +925,9 @@ bool init_arrays(int count) {
     
     objects.trig_colorB = malloc(sizeof(unsigned char) * count);
     if (!objects.trig_colorB) return false;
+    
+    objects.orientation = malloc(sizeof(unsigned char) * count);
+    if (!objects.orientation) return false;
     
     objects.tintGround = malloc(sizeof(bool) * count);
     if (!objects.tintGround) return false;
@@ -922,6 +952,10 @@ bool init_arrays(int count) {
     
     objects.activated = malloc(sizeof(u8) * count);
     if (!objects.activated) return false;
+    
+    objects.collided = malloc(sizeof(u8) * count);
+    if (!objects.collided) return false;
+
 
     memset(objects.random,             0, sizeof(int) * count);
     memset(objects.id,                 0, sizeof(int) * count);
@@ -937,10 +971,12 @@ bool init_arrays(int count) {
     memset(objects.col_channel,        0, sizeof(unsigned short) * count);
     memset(objects.detail_col_channel, 0, sizeof(unsigned short) * count);
     memset(objects.target_color_id,    0, sizeof(unsigned short) * count);
+    memset(objects.hitbox_counter,     0, sizeof(unsigned short) * count);
     memset(objects.transition_applied, 0, sizeof(unsigned char) * count);
     memset(objects.trig_colorR,        0, sizeof(unsigned char) * count);
     memset(objects.trig_colorG,        0, sizeof(unsigned char) * count);
     memset(objects.trig_colorB,        0, sizeof(unsigned char) * count);
+    memset(objects.orientation,        0, sizeof(unsigned char) * count);
     memset(objects.tintGround,         0, sizeof(bool) * count);
     memset(objects.p1_color,           0, sizeof(bool) * count);
     memset(objects.p2_color,           0, sizeof(bool) * count);
@@ -949,6 +985,7 @@ bool init_arrays(int count) {
     memset(objects.flippedH,           0, sizeof(bool) * count);
     memset(objects.flippedV,           0, sizeof(bool) * count);
     memset(objects.activated,          0, sizeof(u8) * count);
+    memset(objects.collided,          0, sizeof(u8) * count);
 
     return true;
 }

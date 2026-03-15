@@ -39,6 +39,8 @@ typedef struct {
 
     unsigned char *transition_applied;
     unsigned char *trig_colorR, *trig_colorG, *trig_colorB;
+    unsigned char *orientation;
+    unsigned char *hitbox_counter;
     bool *tintGround;
     bool *p1_color, *p2_color;
     bool *blending;
@@ -46,6 +48,7 @@ typedef struct {
     bool *flippedH, *flippedV;
 
     u8 *activated;
+    u8 *collided;
 } ObjectsArray;
 
 typedef struct {

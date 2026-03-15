@@ -19,6 +19,12 @@ enum JumpType {
 #define GET_ACTIVATED(obj) ((objects.activated[obj] >> state.current_player) & 1)
 #define SET_ACTIVATED(obj, val) (objects.activated[obj] |= (val << state.current_player))
 
+#define GET_COLLIDED(obj) ((objects.collided[obj] >> state.current_player) & 1)
+#define SET_COLLIDED(obj, val) (objects.collided[obj] |= (val << state.current_player))
+
+#define GET_HITBOX_COUNTER(obj) ((objects.hitbox_counter[obj] >> (state.current_player * 8)) & 0xff)
+#define SET_HITBOX_COUNTER(obj, val) (objects.hitbox_counter[obj] |= ((val) << (state.current_player * 8)))
+
 #define YELLOW_PAD 35
 #define PINK_PAD 140
 #define BLUE_PAD 67
@@ -62,3 +68,6 @@ bool intersect(float x1, float y1, float w1, float h1, float angle1,
 
 bool intersect_rect_circle(float rx, float ry, float rw, float rh, float rangle,
                           float cx, float cy, float cradius);
+
+bool circle_rect_collision(float cx, float cy, float radius,
+                           float x1, float y1, float x2, float y2);

@@ -3,10 +3,11 @@
 #include "icons.h"
 #include "graphics.h"
 
+#include "slope.h"
+
 #include "menus/icon_kit.h"
 #include "collision.h"
 #include "math_helpers.h"
-
 
 const float player_speeds[SPEED_COUNT] = {
 	251.16007972276924,
@@ -20,6 +21,13 @@ const float cube_jump_heights[SPEED_COUNT] = {
     603.72,
     616.68,
     606.42,
+};
+
+const float slopeHeights[SPEED_COUNT] = {
+    322.345224,
+    399.889818,
+    497.224926,
+    600.643296
 };
 
 float player_get_vel(Player *player, float vel) {
@@ -52,39 +60,30 @@ void cube_gamemode(Player *player) {
     
     if (player->on_ground) {
         //MotionTrail_StopStroke(&trail);
-        //if (!player->slope_data.slope) player->rotation = round(player->rotation / 90.0f) * 90.0f;
-        player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
-    }
-    /*
-    // Player on ground or just left the ground
-    if ((player->time_since_ground < 0.05f) && (frame_counter & 0b11) == 0) {
-        particle_templates[CUBE_DRAG].angle = (player->upside_down ? -90 : 90);
-        particle_templates[CUBE_DRAG].gravity_y = (player->upside_down ? 300 : -300);
-        spawn_particle(CUBE_DRAG, getLeft(player) + 4, (player->upside_down ? getTop(player) - 2 : getBottom(player) + 2), NULL);
+        if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
 
     SlopeData slope_data = player->slope_data;
 
     // If not currently on slope, look at the last frame
-    if (!player->slope_data.slope && player->slope_slide_coyote_time) {
+    if (player->slope_data.slope_id < 0 && player->slope_slide_coyote_time) {
         slope_data = player->coyote_slope;
-    }*/
-    //if ((slope_data.slope || player->on_ground) && (state.input.holdJump)) {
+    }
 
-    if (player->on_ground && (state.input.holdJump)) {
-        /*if (slope_data.slope) {
+    if ((slope_data.slope_id >= 0 || player->on_ground) && (state.input.holdJump)) {
+        if (slope_data.slope_id >= 0) {
             // Slope jump
-            int orient = grav_slope_orient(slope_data.slope, player);
+            int orient = grav_slope_orient(slope_data.slope_id, player);
             if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_UP) {
                 float time = clampf(10 * (player->timeElapsed - slope_data.elapsed), 0.4f, 1.0f);
                 set_p_velocity(player, 0.25f * time * slopeHeights[state.speed] + cube_jump_heights[state.speed]);
             } else {
                 set_p_velocity(player, cube_jump_heights[state.speed]);
             }
-        } else {*/
+        } else {
             // Normal jump
             set_p_velocity(player, cube_jump_heights[state.speed]);
-        //}
+        }
         player->inverse_rotation = false;
     
         player->on_ground = false;
@@ -217,7 +216,7 @@ void ufo_gamemode(Player *player) {
         player->ufo_last_y = player->y;
     }
 
-    //if (!player->slope_data.slope) {
+    if (player->slope_data.slope_id < 0) {
         float y_diff = (player->y - player->ufo_last_y) * mult;
 
         if (y_diff >= 0) {
@@ -225,7 +224,7 @@ void ufo_gamemode(Player *player) {
         } else {
             player->rotation = -map_range(-y_diff, 0.f, 300.f, 0.f, 25.f) * mult;
         }
-    //}
+    }
 
     float min = player->mini ? -406.566f : -345.6f;
     float max = player->mini ? 508.248f : 432.0f;
@@ -313,7 +312,7 @@ void run_player(Player *player) {
         player->lerp_rotation = player->rotation;
     } else {
         if (player->gamemode == GAMEMODE_BIRD) {
-            if (player->slope_data.slope_id) {
+            if (player->slope_data.slope_id >= 0) {
                 player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.05f, STEPS_DT);
             } else {
                 player->lerp_rotation = iSlerp(player->lerp_rotation, player->rotation, 0.1f, STEPS_DT);
@@ -337,8 +336,7 @@ void run_player(Player *player) {
         player->ceiling_inv_time = 0;
     }
 
-    
-    bool slopeCheck = false; //player->slope_data.slope && (grav_slope_orient(player->slope_data.slope, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope, player) == ORIENT_UD_DOWN);/
+    bool slopeCheck = player->slope_data.slope_id >= 0 && (grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_UD_DOWN);
 
     if (getGroundBottom(player) < state.ground_y) {
         if (player->ceiling_inv_time <= 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
@@ -346,7 +344,7 @@ void run_player(Player *player) {
         }
 
         if (slopeCheck) {
-            //clear_slope_data(player);
+            clear_slope_data(player);
         }
         
         if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) player->vel_y = 0;
@@ -360,26 +358,26 @@ void run_player(Player *player) {
         }
 
         if (slopeCheck) {
-            //clear_slope_data(player);
+            clear_slope_data(player);
         }
         
         if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) >= 0) player->vel_y = 0;
         player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
     } 
-    /*
+    
     if (player->slope_slide_coyote_time) {
         player->slope_slide_coyote_time--;
         if (!player->slope_slide_coyote_time) {
-            player->coyote_slope.slope = NULL;
+            player->coyote_slope.slope_id = -1;
             player->coyote_slope.elapsed = 0;
-            player->coyote_slope.snapDown = FALSE;
+            player->coyote_slope.snapDown = false;
         }
     }
 
-    if (player->slope_data.slope) {
-        slope_calc(player->slope_data.slope, player);
+    if (player->slope_data.slope_id >= 0) {
+        slope_calc(player->slope_data.slope_id, player);
     }
-*/
+
     if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) update_ship_rotation(player);
 
     player->snap_rotation = false;
