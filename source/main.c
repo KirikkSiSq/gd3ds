@@ -206,6 +206,10 @@ void game_loop() {
         }
 
         if (exiting) {
+            // If death timer is set, the music is muted, unmute it
+            if (state.death_timer > 0) {
+                toggle_playback_mp3();
+            }
             break;
         }
     }
