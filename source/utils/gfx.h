@@ -18,10 +18,8 @@ bool handle_fading();
 void draw_fade();
 void set_fade_status(int status);
 C3D_RenderTarget* C2D_CreateScreenTargetExt(gfxScreen_t screen, gfx3dSide_t side, bool aa);
-void scale_view();
 
 void set_wide(bool wide);
-void set_aa(bool aa);
 void reinitialize_screens();
 
 float get_mirror_x(float x, float factor);

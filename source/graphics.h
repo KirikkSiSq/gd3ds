@@ -21,7 +21,7 @@
 
 #define CAMERA_Y_OFFSET (SCREEN_HEIGHT_AREA - (SCREEN_HEIGHT_AREA * SCALE))
 
-extern bool aaEnabled;
+extern bool particlesDisabled;
 extern bool wideEnabled;
 extern bool glowEnabled; 
 

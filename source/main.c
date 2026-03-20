@@ -234,8 +234,6 @@ void game_loop() {
             C2D_SceneBegin(top);
             C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
             
-            scale_view();
-            
             draw_background(state.background_x / 8, -(state.camera_y / 8) + 200);
 
             C2D_ViewScale(SCALE, SCALE);
@@ -343,8 +341,8 @@ int main(int argc, char* argv[]) {
 
     srand(time(NULL));
 
-    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, aaEnabled);
-    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, aaEnabled);
+    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
+    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
 

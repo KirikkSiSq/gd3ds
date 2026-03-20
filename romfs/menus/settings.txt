@@ -9,8 +9,8 @@ label x=160 y=45 text="Graphics" tag="page1" scale=0.6 align=CENTER
 checkbox x=75 y=85 tag="page1,chk_wide" scale=0.75 action="wide"
 label x=90 y=85 text="800px res" scale=0.4 tag="page1"
 
-checkbox x=75 y=115 tag="page1,chk_aa" scale=0.75 action="aa"
-label x=90 y=115 text="AntiAliasing" scale=0.4 tag="page1"
+checkbox x=75 y=115 tag="page1,chk_particle" scale=0.75 action="particles"
+label x=90 y=115 text="Disable particles" scale=0.4 tag="page1"
 
 checkbox x=75 y=145 tag="page1,chk_glow" scale=0.75 action="glow"
 label x=90 y=145 text="Object glow" scale=0.4 tag="page1"

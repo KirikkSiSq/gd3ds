@@ -190,6 +190,8 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
 }
 
 void updateParticleSystem(ParticleSystem* ps, float dt) {
+    if (particlesDisabled) return;
+    
     if (!ps->active)
         return;
 
@@ -423,6 +425,8 @@ void freeParticleData(ParticleData* d) {
 }
 
 void drawParticleSystem(ParticleSystem* ps, bool isStationary, float x_offset, float y_offset, float opacity) {
+    if (particlesDisabled) return;
+    
     ParticleData* d = &ps->data;
     int count = d->count;
 

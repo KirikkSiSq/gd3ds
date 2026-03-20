@@ -19,7 +19,7 @@ void cfg_init() {
 
     config_load(&cfg, CONFIG_FILE);
 
-    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "aaEnabled", config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "aaEnabled", false));
+    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false));
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true));
 
@@ -33,7 +33,7 @@ void cfg_init() {
     config_set_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", config_get_int(&cfg, CONFIG_CUSTOMIZATION_PATH "glow", DEFAULT_GLOW));
     config_set_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", config_get_bool(&cfg, CONFIG_CUSTOMIZATION_PATH "playerGlowEnabled", false));
 
-    set_aa(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "aaEnabled", false));
+    particlesDisabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", false);
     set_wide(config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", false));
     glowEnabled = config_get_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", true);
 
@@ -51,7 +51,7 @@ void cfg_init() {
 }
 
 void cfg_save() {
-    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "aaEnabled", aaEnabled);
+    config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "particlesDisabled", particlesDisabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "wideEnabled", wideEnabled);
     config_set_bool(&cfg, CONFIG_GRAPHICS_PATH "glowEnabled", glowEnabled);
 

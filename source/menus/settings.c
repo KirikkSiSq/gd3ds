@@ -30,8 +30,8 @@ void wide_settings(UIElement* e) {
     wideEnabled = e->checkbox.checked;
 }
 
-void aa_settings(UIElement* e) {
-    aaEnabled = e->checkbox.checked;
+void particles_settings(UIElement* e) {
+    particlesDisabled = e->checkbox.checked;
 }
 void glow_settings(UIElement* e) {
     glowEnabled = e->checkbox.checked;
@@ -40,7 +40,7 @@ void glow_settings(UIElement* e) {
 static UIAction actions[] = {
     { "exit", exit_settings },
     { "wide", wide_settings },
-    { "aa", aa_settings },
+    { "particles", particles_settings },
     { "glow", glow_settings },
 };
 
@@ -49,7 +49,7 @@ void settings_init() {
     ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/settings.txt");
     yes_exit = false;
     ui_get_element_by_tag(&screen, "chk_wide")->checkbox.checked = wideEnabled;
-    ui_get_element_by_tag(&screen, "chk_aa")->checkbox.checked = aaEnabled;
+    ui_get_element_by_tag(&screen, "chk_particle")->checkbox.checked = particlesDisabled;
     ui_get_element_by_tag(&screen, "chk_glow")->checkbox.checked = glowEnabled;
 }
 

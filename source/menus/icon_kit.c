@@ -249,7 +249,6 @@ void icon_kit_loop() {
             // Bottom screen
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
             C2D_SceneBegin(bot);
-            scale_view();
             draw_fade();
 
             ui_screen_draw(&screen);

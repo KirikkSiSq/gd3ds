@@ -86,7 +86,6 @@ void main_menu_loop() {
     get_buffer(CHANNEL_LINE)->active = false;
 
     bool old_wide = wideEnabled;
-    bool old_aa = aaEnabled;
     
     while (aptMainLoop()) {
         hidScanInput();
@@ -119,15 +118,6 @@ void main_menu_loop() {
             main_menu_color_index++;
         }
 
-        // Check for changes
-        if (aaEnabled != old_aa) {    
-            gspWaitForVBlank();
-            set_aa(aaEnabled);
-            gspWaitForVBlank();
-            reinitialize_screens();
-            old_aa = aaEnabled;
-        }
-
         if (wideEnabled != old_wide) {        
             gspWaitForVBlank();
             set_wide(wideEnabled);
@@ -145,7 +135,6 @@ void main_menu_loop() {
             // Top screen
             C2D_TargetClear(top, C2D_Color32(0, 0, 0, 255));
             C2D_SceneBegin(top);
-            scale_view();
             draw_fade();
 
             draw_background(-40 + (bg_scroll / 8), 0);

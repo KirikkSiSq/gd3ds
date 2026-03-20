@@ -201,16 +201,11 @@ void set_fade_status(int status) {
     fade_status = status;
 }
 
-void scale_view() {
-    if (aaEnabled)
-        C2D_ViewScale(2,2);
-}
-
 void reinitialize_screens() {
     C3D_RenderTargetDelete(top);
     C3D_RenderTargetDelete(bot);
-    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, aaEnabled);
-    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, aaEnabled);
+    top = C2D_CreateScreenTargetExt(GFX_TOP, GFX_LEFT, false);
+    bot = C2D_CreateScreenTargetExt(GFX_BOTTOM, GFX_LEFT, false);
 }
 
 void set_wide(bool wide) {
@@ -220,10 +215,6 @@ void set_wide(bool wide) {
         wideEnabled = wide;
         gfxSetWide(wide);    
     }
-}
-
-void set_aa(bool aa) {
-    aaEnabled = aa;
 }
 
 float get_mirror_x(float x, float factor) {

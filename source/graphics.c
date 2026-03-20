@@ -19,7 +19,7 @@
 
 const Color white = { 255, 255, 255 };
 
-bool aaEnabled = false;
+bool particlesDisabled = false;
 bool wideEnabled = false;
 bool glowEnabled = true;
 
