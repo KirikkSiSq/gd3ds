@@ -658,56 +658,8 @@ static bool sat_overlap(const Vec2D a[4], const Vec2D b[4]) {
     return true;
 }
 
-bool solid_check(float x1, float y1, float w1, float h1,
-                    float x2, float y2, float w2, float h2) {
-    // Right of object 1 < Left of object 2
-    if (x1 + w1 < x2) {
-        return false;
-    }
-
-    // Left of object 1 > Right of object 2
-    if (x1 >= x2 + w2) {
-        return false;
-    }
-
-    // Bottom of object 1 < Top of object 2
-    if (y1 + h1 < y2) {
-        return false;
-    }
-
-    // Top of object 1 > Bottom of object 1
-    if (y1 >= y2 + h2) {
-        return false;
-    }
-
-    // If all above is FALSE, then collision has happen
-    return true;
-}
-
 bool intersect(float x1, float y1, float w1, float h1, float angle1,
                     float x2, float y2, float w2, float h2, float angle2) {
-
-    float angle1_norm = normalize_angle(angle1);
-    float angle2_norm = normalize_angle(angle2);
-    bool r1_90 = (angle1_norm == 0 || angle1_norm == 90 || angle1_norm == 180 || angle1_norm == 270);
-    bool r2_90 = (angle2_norm == 0 || angle2_norm == 90 || angle2_norm == 180 || angle2_norm == 270);
-
-    if (r1_90 && r2_90) {
-        float tmp;
-        if (angle1_norm == 90 || angle1_norm == 270) {
-            tmp = w1;
-            w1 = h1;
-            h1 = tmp;
-        }
-        if (angle2_norm == 90 || angle2_norm == 270) {
-            tmp = w2;
-            w2 = h2;
-            h2 = tmp;
-        }
-        return solid_check(x1 - w1 * 0.5f, y1 - h1 * 0.5f, w1, h1,
-                          x2 - w2 * 0.5f, y2 - h2 * 0.5f, w2, h2);
-    }
-
     // Tighter AABB check
     float max_extent = fmaxf(w1, h1) + fmaxf(w2, h2);
     float dx = fabsf(x1 - x2);
