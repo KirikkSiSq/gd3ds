@@ -121,23 +121,15 @@ void cube_gamemode(Player *player) {
     }
 }
 
-void update_ship_rotation(Player *player) {
-    float diff_x = (player->x - state.old_player.x);
-    float diff_y = (player->y - state.old_player.y);
-    float angle_rad = atan2f(-diff_y, diff_x);
-    if (player->snap_rotation) {
-        player->rotation = RadToDeg(angle_rad);
-    } else {
-        player->rotation = iSlerp(player->rotation, RadToDeg(angle_rad), 0.05f, STEPS_DT);
-    }
-}
-
 void rotate_fly(Player *player, float mult) {
     float diff_x = (player->x - state.old_player.x);
     float diff_y = (player->y - state.old_player.y);
-
-	if (STEPS_DT * 72 <= diff_x * diff_x + diff_y * diff_y) {
-		player->rotation = slerp_fancy(player->rotation * 0.017453292f, atan2f(-diff_y, diff_x), (STEPS_DT * 60) * mult) * 57.29578f;
+    float angle_rad = atan2f(-diff_y, diff_x);
+ 
+    if (player->snap_rotation) {
+        player->rotation = RadToDeg(angle_rad);
+    } else if (STEPS_DT * 72 <= diff_x * diff_x + diff_y * diff_y) {
+		player->rotation = RadToDeg(slerp_fancy(DegToRad(player->rotation), angle_rad, (STEPS_DT * 60) * mult));
 	}
 }
 

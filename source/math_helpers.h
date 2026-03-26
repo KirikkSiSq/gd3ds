@@ -14,6 +14,7 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #define CLAMP(x, lower, upper) (MIN((upper), MAX((x), (lower))))
 
+#define DegToRad(a)   ( (a) *  0.01745329252f )
 #define RadToDeg(a) ( (a) * 57.29577951f )
 
 #define STEPS_HZ 240
