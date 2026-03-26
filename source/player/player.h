@@ -14,7 +14,7 @@ extern int frame_skipped;
 #define STEPS_DT_UNMOD (1.f / STEPS_HZ) // 1/240 seconds per physics step
 
 #define P1_TRAIL_LENGTH 10
-#define P1_TRAIL_DURATION 0.4f
+#define P1_TRAIL_DURATION 0.3f
 #define P1_TRAIL_END_SCALE 0.8f
 
 typedef struct {

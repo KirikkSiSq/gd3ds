@@ -582,7 +582,7 @@ void spawn_p1_trail(Player *player) {
 
 void update_p1_trail(Player *player) {
     // Spawn new p1 icon
-    if (p1_trail && (frame_counter & 0b11) == 0) {
+    if (p1_trail && (frame_counter % 3) == 0) {
         spawn_p1_trail(player);
     }
 
