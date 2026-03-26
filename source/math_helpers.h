@@ -29,5 +29,6 @@ float ease_out(float current, float target, float smoothing);
 float adjust_angle(float angle, int flipX, int flipY);
 float ip1_ceilf(float x);
 float iSlerp(float a, float b, float ratio, float dt);
+float slerp_fancy(float fromAngle, float toAngle, float t);
 float adjust_angle_y(float angle, int flipY);
 float square_distance(float xa, float ya, float xb, float yb);

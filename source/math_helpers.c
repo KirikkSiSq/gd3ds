@@ -64,6 +64,40 @@ float slerp(float a, float b, float ratio) {
 	return a + delta * clampf(ratio, 0.f, 1.f);
 }
 
+float slerp_fancy(float fromAngle, float toAngle, float t) {
+    float fromHalf = fromAngle * 0.5f;
+    float toHalf   = toAngle   * 0.5f;
+
+    float fx = cosf(fromHalf);
+    float fy = sinf(fromHalf);
+    float tx = cosf(toHalf);
+    float ty = sinf(toHalf);
+
+    float dot = fx * tx + fy * ty;
+
+    if (dot < 0.0f) {
+        dot = -dot;
+        tx = -tx;
+        ty = -ty;
+    }
+
+    float w0 = 1.0f - t;
+    float w1 = t;
+
+    if (dot < 0.9999f) {
+        float between = acosf(dot);
+        float sinBetween = sinf(between);
+
+        w0 = sinf(w0 * between) / sinBetween;
+        w1 = sinf(w1 * between) / sinBetween;
+    }
+
+    float ix = w0 * fx + w1 * tx;
+    float iy = w0 * fy + w1 * ty;
+
+    return atan2f(iy, ix) * 2.0f;
+}
+
 float lerp(float from, float to, float alpha) {
     return from * (1.0f - alpha) + to * alpha;
 }

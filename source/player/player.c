@@ -132,6 +132,15 @@ void update_ship_rotation(Player *player) {
     }
 }
 
+void rotate_fly(Player *player, float mult) {
+    float diff_x = (player->x - state.old_player.x);
+    float diff_y = (player->y - state.old_player.y);
+
+	if (STEPS_DT * 72 <= diff_x * diff_x + diff_y * diff_y) {
+		player->rotation = slerp_fancy(player->rotation * 0.017453292f, atan2f(-diff_y, diff_x), (STEPS_DT * 60) * mult) * 57.29578f;
+	}
+}
+
 void ship_gamemode(Player *player) {
     float scale = (player->mini) ? 0.6f : 1.f;
 
@@ -481,7 +490,8 @@ void run_player(Player *player) {
         slope_calc(player->slope_data.slope_id, player);
     }
 
-    if (player->gamemode == GAMEMODE_SHIP || player->gamemode == GAMEMODE_DART) update_ship_rotation(player);
+    if (player->gamemode == GAMEMODE_SHIP) rotate_fly(player, 0.15f);
+    if (player->gamemode == GAMEMODE_DART) rotate_fly(player, player->mini ? 0.4f : 0.25f);
 
     player->snap_rotation = false;
 }

@@ -193,7 +193,7 @@ void game_loop() {
         int steps = 0;
 
         u32 kHeld = hidKeysHeld();
-        // Compare with true to store it in a single bit
+        
         state.input.pressedJump = ((kDown & KEY_A) || (kDown & KEY_TOUCH)) == true;
         state.input.holdJump = (state.input.pressedJump || (kHeld & KEY_A) || (kHeld & KEY_TOUCH)) == true;
         if (state.death_timer <= 0)  {
