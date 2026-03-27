@@ -1020,6 +1020,10 @@ void draw_objects() {
 
             draw_player(&state.player);
 
+            change_blending(true);
+            drawParticleSystem(&drag_particles_2, true, 0, 0, 1.f);
+            change_blending(false);
+
             if (state.dual) {
                 state.current_player = 1;
                 trail = &trail_p2;

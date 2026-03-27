@@ -162,6 +162,7 @@ void game_loop() {
 
     init_op_system();
     initParticleSystem(&drag_particles, &drag_effect);
+    initParticleSystem(&drag_particles_2, &ship_drag_effect);
     gameplay_screen_init();
 
     drag_particles.cfg.startColorRed   = get_white_if_black(p1_color).r / 255.f;
@@ -305,6 +306,7 @@ void game_loop() {
 
         u64 start_part = svcGetSystemTick();
         updateParticleSystem(&drag_particles, delta);
+        updateParticleSystem(&drag_particles_2, delta);
         update_object_particles();
         u64 end_part = svcGetSystemTick();
         u64 ticks_part = end_part - start_part;
@@ -391,6 +393,7 @@ void game_loop() {
     }
 
     freeParticleData(&drag_particles.data);
+    freeParticleData(&drag_particles_2.data);
 
     unload_level();
 

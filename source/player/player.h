@@ -142,6 +142,7 @@ extern MotionTrail wave_trail_p1;
 extern MotionTrail wave_trail_p2;
 
 extern ParticleSystem drag_particles;
+extern ParticleSystem drag_particles_2;
 
 extern const float player_speeds[SPEED_COUNT];
 

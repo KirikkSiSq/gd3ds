@@ -24,6 +24,7 @@ MotionTrail wave_trail_p1;
 MotionTrail wave_trail_p2;
 
 ParticleSystem drag_particles;
+ParticleSystem drag_particles_2;
 
 int frame_skipped = 0;
 
@@ -166,6 +167,15 @@ void ship_gamemode(Player *player) {
     
     trail->positionR = (Vec2){x, y};  
     trail->startingPositionInitialized = true;
+    float calc_x = player->x - state.camera_x;
+    float calc_y = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.camera_y);
+
+    drag_particles_2.emitterX = calc_x;
+    drag_particles_2.emitterY = calc_y;
+    drag_particles_2.emitting = player->on_ground;
+
+    drag_particles_2.gravityFlipped = !player->upside_down;
+    drag_particles_2.scale = (player->mini ? 0.6f : 1.0f);
 
     if (state.dual) {
         // Make both dual players symetric
@@ -283,8 +293,18 @@ void ufo_gamemode(Player *player) {
     float x = player->x + rot_x * scale;
     float y = player->y + rot_y * scale;
     
+    float calc_x = player->x - state.camera_x;
+    float calc_y = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.camera_y);
+
     trail->positionR = (Vec2){x, y};  
     trail->startingPositionInitialized = true;
+
+    drag_particles_2.emitterX = calc_x;
+    drag_particles_2.emitterY = calc_y;
+    drag_particles_2.emitting = player->on_ground;
+
+    drag_particles_2.gravityFlipped = !player->upside_down;
+    drag_particles_2.scale = (player->mini ? 0.6f : 1.0f);
 
     int mult = (player->upside_down ? -1 : 1);
     bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) && (state.input.holdJump));
@@ -382,6 +402,7 @@ void run_player(Player *player) {
     }
 
     drag_particles.emitting = false;
+    drag_particles_2.emitting = false;
 
     switch (player->gamemode) {
         case GAMEMODE_PLAYER:
