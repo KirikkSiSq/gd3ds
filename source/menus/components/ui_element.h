@@ -20,6 +20,7 @@ typedef enum {
     UI_ICON,
     UI_COLOR_BUTTON,
     UI_WINDOW_BUTTON,
+    UI_PROGRESS_BAR,
 } UIElementType;
 
 typedef struct {
@@ -151,6 +152,23 @@ typedef struct {
     C2D_ImageTint tint;
 } UIDarken;
 
+typedef struct {
+    C2D_Sprite sprite_frame;
+    C2D_ImageTint tint_frame;
+
+    C2D_Sprite sprite;
+    C2D_ImageTint tint;
+
+    float scale;
+    int style;
+
+    float value;
+    float max_value;
+
+    bool flip_order;
+    bool useTint;
+} UIProgressBarData;
+
 typedef struct UIElement UIElement;
 
 #define UI_LIST_MAX_ITEMS 64
@@ -193,6 +211,7 @@ struct UIElement {
         UIIconData icon;
         UIColorData color;
         UIWindowButtonData window_button;
+        UIProgressBarData progress_bar;
     };
 
     char tag[TAGS_PER_ELEMENT][TAG_LENGTH];

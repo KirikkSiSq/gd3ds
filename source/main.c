@@ -237,6 +237,8 @@ void game_loop() {
                 handle_player(&state.player);
                 handle_mirror_transition();
 
+                state.level_progress = (state.player.x / level_info.last_obj_x) * 100;
+
                 if (state.dead) break;
 
                 if (state.dual) {
@@ -334,12 +336,13 @@ void game_loop() {
                 draw_ground(state.ground_x, state.camera_y, state.camera_y - CAMERA_Y_OFFSET + SCREEN_HEIGHT_AREA - state.ground_y_gfx, true, SCREEN_WIDTH);
             }
             C2D_ViewScale(1/SCALE, 1/SCALE);
+            gameplay_screen_top_loop();
 
             // Bottom screen
             C2D_SceneBegin(bot);
             C2D_TargetClear(bot, C2D_Color32(0, 0, 0, 255));
 
-            gameplay_screen_loop();
+            gameplay_screen_bot_loop();
 
             if (state.profiling) {
                 float processingTime = ((ticks / CPU_TICKS_PER_MSEC)) * 6;
@@ -489,6 +492,7 @@ int main(int argc, char* argv[]) {
     C2D_SpriteSheetFree(groundSheet);
     C2D_SpriteSheetFree(bigFont_sheet);
     C2D_SpriteSheetFree(window_sheet);
+    C2D_SpriteSheetFree(bar_sheet);
 
     cfg_fini();
 

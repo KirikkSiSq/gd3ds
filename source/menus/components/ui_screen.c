@@ -14,6 +14,7 @@
 #include "ui_icon.h"
 #include "ui_color_button.h"
 #include "ui_window_button.h"
+#include "ui_progress_bar.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,7 @@ C2D_SpriteSheet ui_2_sheet;
 C2D_SpriteSheet window_sheet;
 C2D_SpriteSheet bigFont_sheet;
 C2D_SpriteSheet bg_gradient_sheet;
+C2D_SpriteSheet bar_sheet;
 
 void ui_assets_init() {
     ui_sheet = C2D_SpriteSheetLoad("romfs:/gfx/ui.t3x");
@@ -35,6 +37,7 @@ void ui_assets_init() {
     window_sheet = C2D_SpriteSheetLoad("romfs:/gfx/windows.t3x");
     bigFont_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bigFont.t3x");
     bg_gradient_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bg_gradient.t3x");
+    bar_sheet = C2D_SpriteSheetLoad("romfs:/gfx/bars.t3x");
 }
 
 C2D_SpriteSheet *get_sheet(int sheet) {
@@ -57,6 +60,8 @@ C2D_SpriteSheet *get_sheet(int sheet) {
             return &iconSheet;
         case 8:
             return &bg2Sheet;
+        case 9:
+            return &bar_sheet;
     }
     return NULL;
 }
@@ -280,6 +285,7 @@ void ui_load_screen(UIScreen* screen,
         int w = 0, h = 0;
         int limit = 16;
         float opacity = 1.0f;
+        int max_value = 100;
 
         int index = 1, color_index = 0, gamemode = 0;
 
@@ -357,6 +363,8 @@ void ui_load_screen(UIScreen* screen,
                 gamemode = atoi(value);
             } else if (strcmp(key, "color_index") == 0) {
                 color_index = atoi(value);
+            } else if (strcmp(key, "max_value") == 0) {
+                max_value = atoi(value);
             }
         }
 
@@ -441,6 +449,12 @@ void ui_load_screen(UIScreen* screen,
                     x, y, w, h, style,
                     ui_find_action(actions, actionCount, actionName),
                     text,
+                    tag
+                );
+        } else if (strcmp(type, "progressbar") == 0) {
+            screen->elements[screen->count++] =
+                ui_create_progress_bar(
+                    x, y, style, scale, max_value,
                     tag
                 );
         }

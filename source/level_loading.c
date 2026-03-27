@@ -1036,6 +1036,8 @@ bool parse_string(const char *levelString) {
         assign_object_to_section(i);
     }
     
+    level_info.last_obj_x += (11 * 30.f);
+
     free_string_array(sections, sectionCount);
 
     return true;
