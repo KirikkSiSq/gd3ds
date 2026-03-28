@@ -64,8 +64,12 @@ void set_p_velocity(Player *player, float vel) {
     player->vel_y = vel * ((player->mini) ? 0.8 : 1);
 }
 
+void update_rotation_direction(Player *player) {
+    player->rotation_direction = (player->upside_down ? -1 : 1);
+}
+
 void cube_gamemode(Player *player) {
-    int mult = (player->upside_down ? -1 : 1);
+    int mult = player->rotation_direction;
     
     trail->positionR = (Vec2){player->x, player->y};  
     trail->startingPositionInitialized = true;
@@ -93,6 +97,7 @@ void cube_gamemode(Player *player) {
     
     if (player->on_ground) {
         MotionTrail_StopStroke(trail);
+        update_rotation_direction(player);
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
 

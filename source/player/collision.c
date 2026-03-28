@@ -236,6 +236,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 SET_ACTIVATED(obj, true);
+                update_rotation_direction(player);
             }
             break;
         case PINK_PAD:
@@ -246,6 +247,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 SET_ACTIVATED(obj, true);
+                update_rotation_direction(player);
             }
             break;
         case BLUE_PAD:
@@ -270,6 +272,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 flip_other_player(state.current_player);
                 player->on_ground = false;
                 player->inverse_rotation = false;
+                update_rotation_direction(player);
 
                 SET_ACTIVATED(obj, true);
             }
@@ -286,6 +289,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
+                update_rotation_direction(player);
                 
                 SET_ACTIVATED(obj, true);
             } 
@@ -302,6 +306,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->inverse_rotation = false;
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
+                update_rotation_direction(player);
                 
                 SET_ACTIVATED(obj, true);
             } 
@@ -325,6 +330,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 player->left_ground = true;
                 player->buffering_state = BUFFER_END;
                 player->ufo_last_y = player->y;
+                update_rotation_direction(player);
 
                 SET_ACTIVATED(obj, true);
             } 
@@ -435,7 +441,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     player->snap_rotation = true;
                     set_gamemode(player, GAMEMODE_PLAYER);
                     flip_other_player(state.current_player ^ 1);
-
+                    update_rotation_direction(player);
                 }
                 if (state.dual) {
                     set_dual_bounds();

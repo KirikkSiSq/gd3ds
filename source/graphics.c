@@ -191,10 +191,6 @@ float get_fading_obj_fade(float x, float right_edge) {
 int get_glow_channel(int id) {
     switch (id) {
         case 143:
-        case 144:
-        case 145:
-        case 146:
-        case 147:
         case 177:
         case 178:
         case 179:
@@ -204,6 +200,11 @@ int get_glow_channel(int id) {
         case 186:
         case 187:
         case 188:
+            return CHANNEL_LBG_NOLERP;
+        case 144:
+        case 145:
+        case 146:
+        case 147:
         case 204:
         case 205:
         case 206:
@@ -213,7 +214,7 @@ int get_glow_channel(int id) {
         case 740:
         case 741:
         case 742:
-            return CHANNEL_LBG_NOLERP;
+            return CHANNEL_LBG;
     }
     return CHANNEL_OBJ_BLENDING;
 }

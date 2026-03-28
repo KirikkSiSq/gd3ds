@@ -70,6 +70,8 @@ typedef struct {
     InternalHitbox internal_hitbox;
 
     int gamemode;
+    
+    int rotation_direction;
 
     bool on_ground;
     bool on_ceiling;
@@ -193,3 +195,5 @@ void draw_hitbox_trail(int player);
 void add_new_hitbox(Player *player);
 
 void update_p1_trail(Player *player);
+
+void update_rotation_direction(Player *player);
