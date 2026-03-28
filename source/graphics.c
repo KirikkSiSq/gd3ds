@@ -1011,8 +1011,11 @@ void draw_objects() {
         } else {   
             change_blending(true);
             draw_object_particles();
-            drawParticleSystem(&drag_particles, 0, 0, 1.f);
-            drawParticleSystem(&burst_particles, 0, 0, 1.f);
+            for (int i = 0; i < 2; i++) {
+                drawParticleSystem(&drag_particles[i], 0, 0, 1.f);
+                drawParticleSystem(&burst_particles[i], 0, 0, 1.f);
+            }
+            change_blending(false);
             change_blending(false);
             blend_enabled = false;
             state.current_player = 0;
@@ -1023,7 +1026,9 @@ void draw_objects() {
             draw_player(&state.player);
 
             change_blending(true);
-            drawParticleSystem(&drag_particles_2, 0, 0, 1.f);
+            for (int i = 0; i < 2; i++) {
+                drawParticleSystem(&drag_particles_2[i], 0, 0, 1.f);
+            }
             change_blending(false);
 
             if (state.dual) {

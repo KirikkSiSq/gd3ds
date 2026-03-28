@@ -147,9 +147,9 @@ extern MotionTrail *wave_trail;
 extern MotionTrail wave_trail_p1;
 extern MotionTrail wave_trail_p2;
 
-extern ParticleSystem drag_particles;
-extern ParticleSystem drag_particles_2;
-extern ParticleSystem burst_particles;
+extern ParticleSystem drag_particles[2];
+extern ParticleSystem drag_particles_2[2];
+extern ParticleSystem burst_particles[2];
 
 extern const float player_speeds[SPEED_COUNT];
 

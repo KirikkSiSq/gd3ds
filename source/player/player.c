@@ -23,9 +23,10 @@ MotionTrail *wave_trail;
 MotionTrail wave_trail_p1;
 MotionTrail wave_trail_p2;
 
-ParticleSystem drag_particles;
-ParticleSystem drag_particles_2;
-ParticleSystem burst_particles;
+ParticleSystem drag_particles[2];
+ParticleSystem drag_particles_2[2];
+ParticleSystem burst_particles[2];
+
 
 int frame_skipped = 0;
 
@@ -88,12 +89,12 @@ void cube_gamemode(Player *player) {
         player->rotation += 415.3848f * STEPS_DT * mult * (player->mini ? 1.2f : 1.f);
     }
 
-    drag_particles.emitterX = getLeft(player) - 2;
-    drag_particles.emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
-    drag_particles.emitting = player->time_since_ground < 0.05f;
+    drag_particles[state.current_player].emitterX = getLeft(player) - 2;
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
+    drag_particles[state.current_player].emitting = player->time_since_ground < 0.05f;
 
-    drag_particles.gravityFlipped = player->upside_down;
-    drag_particles.scale = (player->mini ? 0.6f : 1.0f);
+    drag_particles[state.current_player].gravityFlipped = player->upside_down;
+    drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
     
     
     if (player->on_ground) {
@@ -176,12 +177,12 @@ void ship_gamemode(Player *player) {
     float calc_x = player->x - state.camera_x;
     float calc_y = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.camera_y);
 
-    drag_particles_2.emitterX = calc_x;
-    drag_particles_2.emitterY = calc_y;
-    drag_particles_2.emitting = player->on_ground;
+    drag_particles_2[state.current_player].emitterX = calc_x;
+    drag_particles_2[state.current_player].emitterY = calc_y;
+    drag_particles_2[state.current_player].emitting = player->on_ground;
 
-    drag_particles_2.gravityFlipped = !player->upside_down;
-    drag_particles_2.scale = (player->mini ? 0.6f : 1.0f);
+    drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
+    drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     if (state.dual) {
         // Make both dual players symetric
@@ -244,12 +245,12 @@ void ball_gamemode(Player *player) {
     }
 
     
-    drag_particles.emitterX = player->x;
-    drag_particles.emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
-    drag_particles.emitting = player->on_ground || player->on_ceiling;
+    drag_particles[state.current_player].emitterX = player->x;
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
+    drag_particles[state.current_player].emitting = player->on_ground || player->on_ceiling;
 
-    drag_particles.gravityFlipped = player->upside_down;
-    drag_particles.scale = (player->mini ? 0.6f : 1.0f);
+    drag_particles[state.current_player].gravityFlipped = player->upside_down;
+    drag_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     // Jump
     if ((state.input.holdJump) && (player->on_ground || player->on_ceiling) && player->buffering_state == BUFFER_READY) {        
@@ -305,12 +306,12 @@ void ufo_gamemode(Player *player) {
     trail->positionR = (Vec2){x, y};  
     trail->startingPositionInitialized = true;
 
-    drag_particles_2.emitterX = calc_x;
-    drag_particles_2.emitterY = calc_y;
-    drag_particles_2.emitting = player->on_ground;
+    drag_particles_2[state.current_player].emitterX = calc_x;
+    drag_particles_2[state.current_player].emitterY = calc_y;
+    drag_particles_2[state.current_player].emitting = player->on_ground;
 
-    drag_particles_2.gravityFlipped = !player->upside_down;
-    drag_particles_2.scale = (player->mini ? 0.6f : 1.0f);
+    drag_particles_2[state.current_player].gravityFlipped = !player->upside_down;
+    drag_particles_2[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     int mult = (player->upside_down ? -1 : 1);
     bool buffering_check = ((state.old_player.gamemode == GAMEMODE_PLAYER || state.old_player.gamemode == GAMEMODE_SHIP || state.old_player.gamemode == GAMEMODE_DART) && (state.input.holdJump));
@@ -339,12 +340,12 @@ void ufo_gamemode(Player *player) {
         player->burst_particle_timer -= STEPS_DT;
     }
 
-    burst_particles.emitterX = player->x;
-    burst_particles.emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
-    burst_particles.emitting = player->burst_particle_timer > 0;
+    burst_particles[state.current_player].emitterX = player->x;
+    burst_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
+    burst_particles[state.current_player].emitting = player->burst_particle_timer > 0;
 
-    burst_particles.gravityFlipped = player->upside_down;
-    burst_particles.scale = (player->mini ? 0.6f : 1.0f);
+    burst_particles[state.current_player].gravityFlipped = player->upside_down;
+    burst_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
 
     if (player->on_ground) {
         player->ufo_last_y = player->y;

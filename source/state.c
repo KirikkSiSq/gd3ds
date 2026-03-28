@@ -240,6 +240,35 @@ void init_variables() {
     }
 
     state.ground_y_gfx = calc_height;   
+
+    // Particle
+    initParticleSystem(&drag_particles[0], &drag_effect);
+    initParticleSystem(&drag_particles[1], &drag_effect);
+
+    initParticleSystem(&drag_particles_2[0], &ship_drag_effect);
+    initParticleSystem(&drag_particles_2[1], &ship_drag_effect);
+    
+    initParticleSystem(&burst_particles[0], &burst_effect);
+    initParticleSystem(&burst_particles[1], &burst_effect);
+    
+    Color p1_not_white = get_white_if_black(p1_color);
+    Color p2_not_white = get_white_if_black(p2_color);
+
+    drag_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
+    drag_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
+    drag_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+    burst_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
+    burst_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
+    burst_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+    drag_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
+    drag_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
+    drag_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
+
+    burst_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
+    burst_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
+    burst_particles[1].cfg.startColorBlue  = p2_not_white.b / 255.f;
 }
 
 void handle_death() {

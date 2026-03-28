@@ -164,25 +164,9 @@ void game_loop() {
     init_variables();
 
     init_op_system();
-    initParticleSystem(&drag_particles, &drag_effect);
-    initParticleSystem(&drag_particles_2, &ship_drag_effect);
-    initParticleSystem(&burst_particles, &burst_effect);
+
     gameplay_screen_init();
 
-    Color p1_not_white = get_white_if_black(p1_color);
-
-    drag_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
-    drag_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-    drag_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
-
-    burst_particles.cfg.startColorRed   = p1_not_white.r / 255.f;
-    burst_particles.cfg.startColorGreen = p1_not_white.g / 255.f;
-    burst_particles.cfg.startColorBlue  = p1_not_white.b / 255.f;
-
-    drag_particles.emitting = false;
-    drag_particles_2.stationary = true;
-    drag_particles_2.emitting = false;
-    burst_particles.emitting = false;
 
     exiting_level = false;
 
@@ -236,6 +220,13 @@ void game_loop() {
             collision_time = 0;
             player_time = 0;
             handle_player_time = 0;
+    
+            for (int i = 0; i < 2; i++) {
+                drag_particles[i].emitting = false;
+                drag_particles_2[i].stationary = true;
+                drag_particles_2[i].emitting = false;
+                burst_particles[i].emitting = false;
+            }
             
             u64 now = svcGetSystemTick();
             delta = (now - lastTime) / (CPU_TICKS_PER_MSEC * 1000);
@@ -328,9 +319,11 @@ void game_loop() {
             sprite_drawing_time = ticks_obj / CPU_TICKS_PER_MSEC;
 
             u64 start_part = svcGetSystemTick();
-            updateParticleSystem(&drag_particles, delta);
-            updateParticleSystem(&drag_particles_2, delta);
-            updateParticleSystem(&burst_particles, delta);
+            for (int i = 0; i < 2; i++) {
+                updateParticleSystem(&drag_particles[i], delta);
+                updateParticleSystem(&drag_particles_2[i], delta);
+                updateParticleSystem(&burst_particles[i], delta);
+            }
             update_object_particles();
             u64 end_part = svcGetSystemTick();
             u64 ticks_part = end_part - start_part;
@@ -435,9 +428,13 @@ void game_loop() {
         }
     }
 
-    freeParticleData(&drag_particles.data);
-    freeParticleData(&drag_particles_2.data);
-    freeParticleData(&burst_particles.data);
+    freeParticleData(&drag_particles[0].data);
+    freeParticleData(&drag_particles_2[0].data);
+    freeParticleData(&burst_particles[0].data);
+    
+    freeParticleData(&drag_particles[1].data);
+    freeParticleData(&drag_particles[1].data);
+    freeParticleData(&burst_particles[1].data);
 
     unload_level();
 
