@@ -198,6 +198,7 @@ void ship_gamemode(Player *player) {
         // Make both dual players symetric
         if (state.input.holdJump) {
             player->buffering_state = BUFFER_END;
+            ship_fire_particles[state.current_player].emitting = true;
             if (player->vel_y <= -101.541492f)
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
             else
