@@ -56,11 +56,11 @@ bool is_citra() {
 
 void no_dsp_firmware(void) {
     consoleInit(GFX_TOP, NULL);
-    printf("\x1b[01;00H/////////////FATAL///ERROR////////////////////////");
+    printf("\x1b[01;00H/////////////////FATAL///ERROR////////////////////");
     printf("\x1b[03;00HNDSP could not be initalized.");
     printf("\x1b[05;00HThis is probably because your dspfirm is missing.");
-    printf("\x1b[07;00HPut the ndsp firmwared called dspfirm.cdc");
-    printf("\x1b[09;00Hon your sd card in sdmc:/3ds");
+    printf("\x1b[07;00HExtract the ndsp firmware (dspfirm.cdc) to");
+    printf("\x1b[09;00Hsdmc:/3ds/ on your sd card.");
     printf("\x1b[11;00HCitra/Azahar users only need the file to be there,");
     printf("\x1b[13;00Hit can be empty.");
     printf("\x1b[15;00HPress start to exit.");
@@ -173,6 +173,12 @@ void game_loop() {
 
     initParticleSystem(&drag_particles_2[0], &ship_drag_effect);
     initParticleSystem(&drag_particles_2[1], &ship_drag_effect);
+
+    initParticleSystem(&ship_fire_particles[0], &drag_effect);
+    initParticleSystem(&ship_fire_particles[1], &drag_effect);
+
+    initParticleSystem(&ufo_secondary_particles[0], &drag_effect);
+    initParticleSystem(&ufo_secondary_particles[1], &drag_effect);
     
     initParticleSystem(&burst_particles[0], &burst_effect);
     initParticleSystem(&burst_particles[1], &burst_effect);
@@ -187,6 +193,22 @@ void game_loop() {
     burst_particles[0].cfg.startColorRed   = p1_not_white.r / 255.f;
     burst_particles[0].cfg.startColorGreen = p1_not_white.g / 255.f;
     burst_particles[0].cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+    ufo_secondary_particles[0].cfg.startColorRed   = p2_not_white.r / 255.f;
+    ufo_secondary_particles[0].cfg.startColorGreen = p2_not_white.g / 255.f;
+    ufo_secondary_particles[0].cfg.startColorBlue  = p2_not_white.b / 255.f;
+
+    ufo_secondary_particles[1].cfg.startColorRed   = p1_not_white.r / 255.f;
+    ufo_secondary_particles[1].cfg.startColorGreen = p1_not_white.g / 255.f;
+    ufo_secondary_particles[1].cfg.startColorBlue  = p1_not_white.b / 255.f;
+
+    // ship_fire_particles[0].cfg.startColorRed   = 255.f;
+    // ship_fire_particles[0].cfg.startColorGreen = 65.f;
+    // ship_fire_particles[0].cfg.startColorBlue  = 0.f;
+
+    // ship_fire_particles[1].cfg.startColorRed   = 255.f;
+    // ship_fire_particles[1].cfg.startColorGreen = 65.f;
+    // ship_fire_particles[1].cfg.startColorBlue  = 0.f;
 
     drag_particles[1].cfg.startColorRed   = p2_not_white.r / 255.f;
     drag_particles[1].cfg.startColorGreen = p2_not_white.g / 255.f;
@@ -253,6 +275,8 @@ void game_loop() {
                 drag_particles[i].emitting = false;
                 drag_particles_2[i].stationary = true;
                 drag_particles_2[i].emitting = false;
+                ship_fire_particles[i].emitting = false;
+                ufo_secondary_particles[i].emitting = false;
                 burst_particles[i].emitting = false;
             }
             
@@ -350,6 +374,8 @@ void game_loop() {
             for (int i = 0; i < 2; i++) {
                 updateParticleSystem(&drag_particles[i], delta);
                 updateParticleSystem(&drag_particles_2[i], delta);
+                updateParticleSystem(&ship_fire_particles[i], delta);
+                updateParticleSystem(&ufo_secondary_particles[i], delta);
                 updateParticleSystem(&burst_particles[i], delta);
             }
             update_object_particles();
@@ -458,12 +484,15 @@ void game_loop() {
 
     freeParticleData(&drag_particles[0].data);
     freeParticleData(&drag_particles_2[0].data);
+freeParticleData(&ship_fire_particles[0].data);
+    freeParticleData(&ufo_secondary_particles[0].data);
     freeParticleData(&burst_particles[0].data);
-    
-    freeParticleData(&drag_particles[1].data);
-    freeParticleData(&drag_particles[1].data);
-    freeParticleData(&burst_particles[1].data);
 
+    freeParticleData(&drag_particles[1].data);
+    freeParticleData(&drag_particles[1].data);
+    freeParticleData(&ship_fire_particles[1].data);
+    freeParticleData(&ufo_secondary_particles[1].data);
+    freeParticleData(&burst_particles[1].data);
     unload_level();
 
     game_state = STATE_LEVEL_SELECT;
