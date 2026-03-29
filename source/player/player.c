@@ -181,7 +181,7 @@ void ship_gamemode(Player *player) {
 
     ship_fire_particles[state.current_player].emitterX = x;
     ship_fire_particles[state.current_player].emitterY = y;
-    ship_fire_particles[state.current_player].emitting = false;
+    ship_fire_particles[state.current_player].emitting = state.input.holdJump;
 
     ship_fire_particles[state.current_player].gravityFlipped = player->upside_down;
     ship_fire_particles[state.current_player].scale = (player->mini ? 0.6f : 1.0f);
@@ -198,7 +198,6 @@ void ship_gamemode(Player *player) {
         // Make both dual players symetric
         if (state.input.holdJump) {
             player->buffering_state = BUFFER_END;
-            ship_fire_particles[state.current_player].emitting = true;
             if (player->vel_y <= -101.541492f)
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
             else
@@ -212,7 +211,6 @@ void ship_gamemode(Player *player) {
     } else {
         if (state.input.holdJump) {
             player->buffering_state = BUFFER_END;
-            ship_fire_particles[state.current_player].emitting = true;
             if (player->vel_y <= grav(player, 101.541492f))
                 player->gravity = player->mini ? 1643.5872f : 1397.0491f;
             else
