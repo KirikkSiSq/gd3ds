@@ -484,12 +484,12 @@ void game_loop() {
 
     freeParticleData(&drag_particles[0].data);
     freeParticleData(&drag_particles_2[0].data);
-freeParticleData(&ship_fire_particles[0].data);
+    freeParticleData(&ship_fire_particles[0].data);
     freeParticleData(&ufo_secondary_particles[0].data);
     freeParticleData(&burst_particles[0].data);
 
     freeParticleData(&drag_particles[1].data);
-    freeParticleData(&drag_particles[1].data);
+    freeParticleData(&drag_particles_2[1].data);
     freeParticleData(&ship_fire_particles[1].data);
     freeParticleData(&ufo_secondary_particles[1].data);
     freeParticleData(&burst_particles[1].data);
