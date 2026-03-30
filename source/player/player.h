@@ -21,6 +21,8 @@ extern int frame_skipped;
 
 #define DRAG_PARTICLES_FLOOR_DURATION 0.1f
 
+#define BALL_SLOW_ROTATION 0.7f
+
 typedef struct {
     int slope_id;
     float elapsed;

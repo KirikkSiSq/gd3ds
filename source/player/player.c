@@ -157,6 +157,28 @@ void rotate_fly(Player *player, float mult) {
 	}
 }
 
+float get_ball_rotation_speed(Player *player) {
+    float speed = (player->mini ? 0.16f : 0.2f);
+    switch (state.speed) {
+        case 0:
+            speed *= 1.2405638f;
+            break;
+        case 1:
+            speed *= 0.80424345f;
+            break;
+        case 2:
+            speed *= 0.6657693f;
+            break;
+        case 3:
+            speed *= 0.5409375f;
+            break;
+        default:
+            break;
+    }
+
+    return 120 / speed;
+}
+
 void ship_gamemode(Player *player) {
     float scale = (player->mini) ? 0.6f : 1.f;
 
@@ -262,7 +284,7 @@ void ball_gamemode(Player *player) {
     
     if (player->on_ground || player->on_ceiling) {
         MotionTrail_StopStroke(trail);
-        player->ball_rotation_speed = 2.3;
+        player->ball_rotation_speed = 1.f;
     }
 
     
@@ -284,12 +306,12 @@ void ball_gamemode(Player *player) {
         player->vel_y -= (delta_y < 0) ? 0 : delta_y;
         player->buffering_state = BUFFER_END;
         
-        player->ball_rotation_speed = -1.f;
+        player->ball_rotation_speed = -BALL_SLOW_ROTATION;
 
         player->on_ground = false;
     }
     
-    player->rotation += player->ball_rotation_speed * mult * (player_speeds[state.speed] / player_speeds[SPEED_NORMAL]) / (player->mini ? 0.8 : 1);
+    player->rotation += player->ball_rotation_speed * get_ball_rotation_speed(player) * mult * STEPS_DT * (0.9f * 0.9f);
 
     if (player->vel_y < -810) {
         player->vel_y = -810;
