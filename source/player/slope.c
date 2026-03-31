@@ -509,8 +509,10 @@ void slope_collide(int obj, Player *player) {
                 state.dead = true;
                 return;
             }
+
+            if (orient >= ORIENT_UD_DOWN) player->on_ceiling = true;
+            else player->on_ground = true;
             
-            player->on_ground = true;
             player->inverse_rotation = false;
             player->slope_data.slope_id = obj;
             slope_snap_y(obj, player);
