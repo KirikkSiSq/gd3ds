@@ -205,15 +205,20 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
 }
 
 float get_fading_obj_fade(float x, float right_edge) {
-    float fading_obj_width = FADING_OBJ_WIDTH;
-    if (x < FADING_OBJ_PADDING || x > right_edge - FADING_OBJ_PADDING)
-        return 1.f;
-    else if (x < FADING_OBJ_PADDING + fading_obj_width)
-        return clampf(1.f - ((x - FADING_OBJ_PADDING) / fading_obj_width), 0.05f, 1.f);
-    else if (x > right_edge - fading_obj_width - FADING_OBJ_PADDING)
-        return clampf(1.f - ((right_edge - (x + FADING_OBJ_PADDING)) / fading_obj_width), 0.05f, 1.f);
-    else
-        return 0.05f;
+
+    if (!state.dead) {
+        float fading_obj_width = FADING_OBJ_WIDTH;
+        if (x < FADING_OBJ_PADDING || x > right_edge - FADING_OBJ_PADDING)
+            return 1.f;
+        else if (x < FADING_OBJ_PADDING + fading_obj_width)
+            return clampf(1.f - ((x - FADING_OBJ_PADDING) / fading_obj_width), 0.05f, 1.f);
+        else if (x > right_edge - fading_obj_width - FADING_OBJ_PADDING)
+            return clampf(1.f - ((right_edge - (x + FADING_OBJ_PADDING)) / fading_obj_width), 0.05f, 1.f);
+        else
+            return 0.05f;
+    }
+
+    return 1.f;
 }
 
 int get_glow_channel(int id) {
