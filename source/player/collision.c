@@ -1124,12 +1124,18 @@ void collide_with_objects(Player *player) {
                 // Save some types to buffer, so they can be checked in a type order
                 if (hitbox->collision_type == HITBOX_SOLID) {
                     if (hitbox->type == COLLISION_SLOPE) {
-                        slope_buffer[slope_count++] = obj;
+                        if (slope_count < MAX_COLLIDED_OBJECTS) {
+                            slope_buffer[slope_count++] = obj;
+                        }
                     } else {
-                        block_buffer[block_count++] = obj;
+                        if (block_count < MAX_COLLIDED_OBJECTS) {
+                            block_buffer[block_count++] = obj;
+                        }
                     }
                 } else if (hitbox->collision_type == HITBOX_HAZARD) {
-                    hazard_buffer[hazard_count++] = obj;
+                    if (hazard_count < MAX_COLLIDED_OBJECTS) {
+                        hazard_buffer[hazard_count++] = obj;
+                    }
                 } else { // HITBOX_SPECIAL
                     collide_with_obj(player, obj);
                 }
