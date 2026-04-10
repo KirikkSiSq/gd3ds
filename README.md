@@ -16,17 +16,17 @@ Geometry Dash and its respective resources are by RobTop Games.
 - [x] Pause Menu
 - [x] Better Bottom Screen HUD
 - [x] Progress Bar
+- [x] 1.9 Level Importing (via SD Card)
+- [x] Credits Menu
+- [x] Death Animation
+- [x] Touch Screen Visual Feedback
 - [ ] Missing Visual Effects
 - [ ] Working Level Statistics
-- [ ] Credits Menu
-- [ ] Touch Screen Visual Feedback
 - [ ] Icons on the Title Screen
 - [ ] Level Complete Animation
-- [ ] Death Animation
 - [ ] "New Best!" Pop-up
 - [ ] Practice Mode
 - [ ] Achievements (Maybe)
-- [ ] 1.9 Level Importing (via SD Card)
 - [ ] Online Level Search Page
 - [ ] Server Switcher (Between 1.9 GDPS and RobTop's Servers)
 
