@@ -69,44 +69,48 @@ void run_camera() {
             state.camera_y = final_camera_y_wall + 3.f * random_float(-1, 1);
         }
     } else */
-     if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
-        float distance = state.camera_y_middle - player->y;
-        float distance_abs = fabsf(distance);
+     
+    float cam_y = state.camera_y_lerp;
+    float target_y = cam_y;
 
-        int mult = (distance >= 0 ? 1 : -1);
+    #define CAM_Y_MAGIC (320 / 2)
+    #define CAM_Y_MAGIC_2 (180 / 2)
 
-        float difference = player->y - state.old_player.y;
+    if (player->gamemode == GAMEMODE_PLAYER && !state.dual) {
+        float player_y = player->y;
+        float anchor_y = cam_y - CAM_Y_MAGIC_2 + CAM_Y_MAGIC;
+        
+        const float margin_above = 140 / 2;
+        const float margin_below = 80 / 2;
 
-        if (distance_abs > 60.f && (difference * -mult > 0 || player->on_ground)) {
-            float lerp_ratio = 0.1f;
-            if (player->on_ground) {
-                // Slowly make player in bounds (60 units from player center)
-                state.camera_y_lerp = player->y + 60.f * mult - ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
-                lerp_ratio = 0.2f;
-            } else {
-                // Move camera
-                state.camera_y_lerp += difference;
-            }
-            // Lerp so the camera doesn't go all the way when not moving
-            state.intermediate_camera_y = ease_out(state.intermediate_camera_y, state.camera_y_lerp, lerp_ratio);
-        } else {
-            state.camera_y_lerp = state.intermediate_camera_y;
+        if (player_y > anchor_y + margin_above) {
+            target_y = player_y - CAM_Y_MAGIC - margin_above + CAM_Y_MAGIC_2;
+        } else if (player_y < anchor_y - margin_below) {
+            target_y = player_y - CAM_Y_MAGIC + margin_below + CAM_Y_MAGIC_2;
         }
-
-        if (state.intermediate_camera_y < 0) state.intermediate_camera_y = 0;
-        if (state.camera_y_lerp > MAX_LEVEL_HEIGHT) state.camera_y_lerp = MAX_LEVEL_HEIGHT;
-
-        state.camera_y = ease_out(state.camera_y, state.intermediate_camera_y, 0.07f);
     } else {
-        state.camera_y = ease_out(state.camera_y, state.camera_intended_y, 0.02f);
-        state.camera_y_lerp = state.camera_y;
-        state.intermediate_camera_y = state.camera_y;
+        target_y = state.camera_intended_y;
     }
-	state.camera_x = player->x - 125.0f/SCALE;
+        
+    if (target_y < 0) {
+        target_y = 0;
+    }
     
+    cam_y += (target_y - cam_y) / (10 / 0.25f);
+    
+    if (cam_y < 0) {
+        cam_y = 0;
+    }
+    
+        cam_y = MAX_LEVEL_HEIGHT;
+    }
 
+    state.camera_y_lerp = cam_y;
+    state.camera_y = state.camera_y_lerp;
+    state.camera_y_middle = state.camera_y + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
+
+	state.camera_x = player->x - 125.0f/SCALE;
     state.camera_x_middle = state.camera_x + (SCREEN_WIDTH_AREA / 2);
-    state.camera_y_middle = state.camera_y_lerp + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
 }
 
 void set_hitbox_size(Player *player, int gamemode) {
@@ -233,11 +237,10 @@ void init_variables() {
     run_camera();
 
     // Set camera vertical pos
-    state.camera_y = state.camera_intended_y;
-    state.camera_y_lerp = state.camera_y;
-    state.intermediate_camera_y = state.camera_y;
+    state.camera_y_lerp = state.camera_intended_y;
+    state.camera_y = state.camera_y_lerp;
+    state.camera_y_middle = state.camera_y + ((SCREEN_HEIGHT_AREA / 2) - CAMERA_Y_OFFSET);
 
-    
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
