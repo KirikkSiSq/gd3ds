@@ -117,14 +117,12 @@ void cube_gamemode(Player *player) {
     if (player->on_ground) {
         MotionTrail_StopStroke(trail);
         update_rotation_direction(player);
-        player->buffering_state = BUFFER_END;
 
         if (player->slope_data.slope_id < 0) player->rotation = roundf(player->rotation / 90.0f) * 90.0f;
     }
 
     if (player->upside_down && state.input.holdJump && player->coyote_frames < 10) {
         jump = true;
-        player->buffering_state = BUFFER_END;
     }
 
     SlopeData slope_data = player->slope_data;
@@ -149,6 +147,7 @@ void cube_gamemode(Player *player) {
             set_p_velocity(player, cube_jump_heights[state.speed], state.old_input.holdJump);
         }
         player->inverse_rotation = false;
+        player->buffering_state = BUFFER_END;
     
         player->on_ground = false;
     
