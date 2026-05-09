@@ -200,6 +200,26 @@ float mirror_angle(float angle, bool hflip, bool vflip)
     return normalize_angle(angle);
 }
 
+bool object_fades(int obj) {
+    switch (objects.id[obj]) {
+        case 144:
+        case 145:
+        case 146:
+        case 147:
+        case 204:
+        case 205:
+        case 206:
+        case 459:
+        case 673:
+        case 674:
+        case 740:
+        case 741:
+        case 742:
+            return true;
+    }
+    return false;
+}
+
 inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) {
     int obj_id = objects.id[obj];
     int col_channel = game_obj->base_color;
@@ -233,24 +253,95 @@ inline int get_color_channel(int col_type, int obj, const GameObject *game_obj) 
     return col_channel;
 }
 
-float get_fading_obj_fade(float x, float right_edge) {
+const float leftFadeBound = (SCREEN_WIDTH_AREA/2) - 75.f;
+const float leftFadeWidth = leftFadeBound - 30;
+const float rightFadeBound = leftFadeBound + 110;
+const float rightFadeWidth = (SCREEN_WIDTH_AREA) - (leftFadeBound + 190);
 
+float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
     if (!state.dead) {
-        float fading_obj_width = FADING_OBJ_WIDTH;
-        if (x < FADING_OBJ_PADDING || x > right_edge - FADING_OBJ_PADDING)
-            return 1.f;
-        else if (x < FADING_OBJ_PADDING + fading_obj_width)
-            return clampf(1.f - ((x - FADING_OBJ_PADDING) / fading_obj_width), 0.05f, 1.f);
-        else if (x > right_edge - fading_obj_width - FADING_OBJ_PADDING)
-            return clampf(1.f - ((right_edge - (x + FADING_OBJ_PADDING)) / fading_obj_width), 0.05f, 1.f);
-        else
-            return 0.05f;
+        // Offset fade checks slightly so invisible blocks
+        // begin fading before reaching the actual boundary
+        float objX = objects.x[obj];
+        float marginX = objX;
+        if (objX <= state.camera_x_middle) {
+            marginX += 0;//object->m_fadeMargin;
+        } else {
+            marginX -= 0;//object->m_fadeMargin;
+        }
+        objX = marginX;
+
+        float halfCameraWidth = (SCREEN_WIDTH_AREA / 2);
+        float camX = state.camera_x;
+        
+        // Additional screen-edge fade so objects near the
+        // far edges of the screen become less visible
+        float edgeFactor;
+        float distanceFromCenter;
+        if (objX <= halfCameraWidth + camX) {
+            // Left fade
+            edgeFactor = 0.014285714f;
+            distanceFromCenter = ((halfCameraWidth + camX) - objX);
+        } else {
+            // Right fade
+            edgeFactor = 0.02f;
+            distanceFromCenter = (objX - camX) - halfCameraWidth;
+        }
+        
+        // Convert edge distance into a normalized visibility factor
+        float visibilityScale = (halfCameraWidth - distanceFromCenter) * edgeFactor;
+        float edgeVisibilityFactor = CLAMP(visibilityScale, 0.0f, 1.0f);
+
+        // Compute fade distance from the invisible region bounds
+        float distanceFromFade;
+        float fadeWidth;
+
+        if (marginX <= camX + rightFadeBound) {
+            // Left fade
+            distanceFromFade = (camX + leftFadeBound) - marginX;
+            fadeWidth = leftFadeWidth;
+        } else {
+            // Right fade
+            distanceFromFade = (marginX - camX) - rightFadeBound;
+            fadeWidth = rightFadeWidth;
+        }
+
+        // Set a minimum of 1
+        if (fadeWidth <= 1.0f) {
+            fadeWidth = 1.0f;
+        }
+        
+        // Minimum opacity is 5%
+        float fadeAlpha = CLAMP(distanceFromFade / fadeWidth, 0.0f, 1.0f);
+        int objectOpacity = (fadeAlpha * 0.95f + 0.05f) * 255;
+        
+        int edgeVisibility = edgeVisibilityFactor * 255;
+        if (objectOpacity >= edgeVisibility) {
+            objectOpacity = edgeVisibility;
+        }
+
+        int glowOpacity = (fadeAlpha * 0.85f + 0.15f) * 255;
+        if (glowOpacity >= edgeVisibility) {
+            glowOpacity = edgeVisibility;
+        }
+
+       *glow_out = glowOpacity / 255.f;
+        return objectOpacity / 255.f;
     }
 
     return 1.f;
 }
 
-int get_glow_channel(int id) {
+int get_glow_channel(int obj) {
+    int id = objects.id[obj];
+    if (object_fades(id)) {
+        if (objects.opacity[obj] < 0.8f || state.dead) {
+            return CHANNEL_LBG_NOLERP;
+        } else {
+            return CHANNEL_INVISIBLE_GLOW;
+        }
+    }
+
     switch (id) {
         case 143:
         case 177:
@@ -290,7 +381,7 @@ int get_glow_channel(int id) {
         case 201:
         case 202:
         case 203:
-            return WHITE;
+            return CHANNEL_WHITE;
         case 397:
         case 398:
         case 399:
@@ -510,7 +601,7 @@ void spawn_object_at(
         vo->layer = 1;
         vo->col_type = COLOR_TYPE_BASE;
         vo->opacity = 0.5f;
-        vo->col_channel = get_glow_channel(id);
+        vo->col_channel = get_glow_channel(obj_game);
         viewable_objects_ptr[sprite_count] = vo;
         sprite_count++;
     }
@@ -677,26 +768,6 @@ int get_object_layers(int id) {
         if (obj->children[c].texture >= 0) count++;
     }
     return count;
-}
-
-bool object_fades(int obj) {
-    switch (objects.id[obj]) {
-        case 144:
-        case 145:
-        case 146:
-        case 147:
-        case 204:
-        case 205:
-        case 206:
-        case 459:
-        case 673:
-        case 674:
-        case 740:
-        case 741:
-        case 742:
-            return true;
-    }
-    return false;
 }
 
 int obj_edge_fade(float x, int right_edge) {
@@ -1086,6 +1157,22 @@ void create_objects() {
                 col.color.g = 255;
                 col.color.b = 255;
                 col.blending = false;
+            } else if (col_channel == CHANNEL_INVISIBLE_GLOW) {
+                Color lbg = channels[CHANNEL_LBG_NOLERP].color;
+                Color p1 = get_white_if_black(p1_color);
+                float opacity = objects.opacity[obj->obj];
+
+                float blendFactor = 1.9f - 1.5f * opacity;
+                float oneMinusFactor = 1.0f - blendFactor;
+
+                int r = (float)p1.r * oneMinusFactor + (float)lbg.r * blendFactor;
+                int g = (float)p1.g * oneMinusFactor + (float)lbg.g * blendFactor;
+                int b = (float)p1.b * oneMinusFactor + (float)lbg.b * blendFactor;
+                
+                col.color.r = CLAMP(r, 0, 255);
+                col.color.g = CLAMP(g, 0, 255);
+                col.color.b = CLAMP(b, 0, 255);
+                col.blending = true;
             } else {
                 col = channels[col_channel];
             }
@@ -1094,11 +1181,23 @@ void create_objects() {
             float x = ((objects.x[game_object] - state.camera_x));
             
             float opacity = obj->opacity;
+
+            // Handle invisible object opacity
             if (object_fades(game_object)) {
-                opacity *= get_fading_obj_fade(x, SCREEN_WIDTH / SCALE);
+                float glow_out;
+                float fading_opacity = get_fading_obj_fade(game_object, SCREEN_WIDTH / SCALE, &glow_out);
+                
+                // Check if layer is glow
+                if (obj->layer == 1) opacity *= glow_out;
+                else opacity *= fading_opacity;
             }
+
+            int real_opacity = get_obj_opacity(game_object, x) * opacity;
+
+            // Set opacity here
+            if (obj->layer == 0) objects.opacity[game_object] = real_opacity / 255.f;
             
-            C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, get_obj_opacity(game_object, x) * opacity), 1.f);
+            C2D_PlainImageTint(&obj->tint, C2D_Color32(col.color.r, col.color.g, col.color.b, real_opacity), 1.f);
         }
     }
 }

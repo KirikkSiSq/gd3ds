@@ -993,6 +993,7 @@ void free_arrays() {
     if (objects.zlayer)             { free(objects.zlayer);             objects.zlayer = NULL; }
     if (objects.zorder)             { free(objects.zorder);             objects.zorder = NULL; }
     if (objects.trig_duration)      { free(objects.trig_duration);      objects.trig_duration = NULL; }
+    if (objects.opacity)            { free(objects.opacity);            objects.opacity = NULL; }
     if (objects.width)              { free(objects.width);              objects.width = NULL; }
     if (objects.height)             { free(objects.height);             objects.height = NULL; }
     if (objects.v1p9_col_channel)   { free(objects.v1p9_col_channel);   objects.v1p9_col_channel = NULL; }
@@ -1041,6 +1042,9 @@ bool init_arrays(int count) {
     
     objects.trig_duration = malloc(sizeof(float) * count);
     if (!objects.trig_duration) return false;
+    
+    objects.opacity = malloc(sizeof(float) * count);
+    if (!objects.opacity) return false;
     
     objects.width = malloc(sizeof(float) * count);
     if (!objects.width) return false;
@@ -1117,6 +1121,7 @@ bool init_arrays(int count) {
     memset(objects.zlayer,             0, sizeof(int) * count);
     memset(objects.zorder,             0, sizeof(int) * count);
     memset(objects.trig_duration,      0, sizeof(float) * count);
+    memset(objects.opacity,            0, sizeof(float) * count);
     memset(objects.width,              0, sizeof(float) * count);
     memset(objects.height,             0, sizeof(float) * count);
     memset(objects.v1p9_col_channel,   0, sizeof(unsigned short) * count);
@@ -1368,6 +1373,7 @@ void reload_level() {
         objects.hitbox_counter[i] = 0;
         objects.transition_applied[i] = FADE_NONE;
         objects.toggled[i] = false;
+        objects.opacity[i] = 1.f;
     }
 
     init_col_channels();
