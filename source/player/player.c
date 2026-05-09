@@ -474,6 +474,38 @@ void wave_gamemode(Player *player) {
     player->vel_y = (input * 2 - 1) * player_speeds[state.speed] * (player->mini ? 2 : 1);
 }
 
+void clamp_player_ground(Player *player) {
+    bool slopeCheck = player->slope_data.slope_id >= 0 && (grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_UD_DOWN);
+
+    // Ground
+    if (getGroundBottom(player) < state.ground_y) {
+        if (player->ceiling_inv_time <= 0 && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
+            state.dead = true;
+        }
+
+        if (slopeCheck) {
+            clear_slope_data(player);
+        }
+        
+        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
+        player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
+        player->snap_data.player_frame = 0;
+    }
+
+    // Ceiling
+    if (getGroundTop(player) > state.ceiling_y) {
+        if (player->ceiling_inv_time <= 0  && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && !player->upside_down) {
+            state.dead = true;
+        }
+
+        if (slopeCheck) {
+            clear_slope_data(player);
+        }
+        
+        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
+        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);
+    } 
+}
 void run_player(Player *player) {
     float scale = (player->mini) ? 0.6f : 1.f;
     trail->stroke = 10.f * scale;
@@ -608,36 +640,7 @@ void run_player(Player *player) {
         player->ceiling_inv_time = 0;
     }
 
-    bool slopeCheck = player->slope_data.slope_id >= 0 && (grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_NORMAL_DOWN || grav_slope_orient(player->slope_data.slope_id, player) == ORIENT_UD_DOWN);
-
-    // Ground
-    if (getGroundBottom(player) < state.ground_y) {
-        if (player->ceiling_inv_time <= 0 && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && player->upside_down) {
-            state.dead = true;
-        }
-
-        if (slopeCheck) {
-            clear_slope_data(player);
-        }
-        
-        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) <= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
-        player->y = state.ground_y + (player->height / 2) + ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
-        player->snap_data.player_frame = 0;
-    }
-
-    // Ceiling
-    if (getGroundTop(player) > state.ceiling_y) {
-        if (player->ceiling_inv_time <= 0  && player->gravObj_id < 0 && player->gamemode == GAMEMODE_PLAYER && !player->upside_down) {
-            state.dead = true;
-        }
-
-        if (slopeCheck) {
-            clear_slope_data(player);
-        }
-        
-        if (player->gamemode != GAMEMODE_DART && grav(player, player->vel_y) >= 0) set_p_velocity(player, 0, player->gamemode == GAMEMODE_PLAYER_BALL);
-        player->y = state.ceiling_y - (player->height / 2) - ((player->gamemode == GAMEMODE_DART) ? (player->mini ? 3 : 5) : 0);;
-    } 
+    clamp_player_ground(player);
     
     if (player->slope_slide_coyote_time) {
         player->slope_slide_coyote_time--;
@@ -722,6 +725,8 @@ void handle_player(Player *player) {
     player->vel_x = player_speeds[state.speed]; 
     player->x += player->vel_x * STEPS_DT;
     player->y += player_get_vel(player, player->vel_y) * STEPS_DT;
+
+    clamp_player_ground(player);
 
     player->frame++;
 
