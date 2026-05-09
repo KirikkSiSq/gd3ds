@@ -333,15 +333,11 @@ float get_fading_obj_fade(int obj, float right_edge, float *glow_out) {
 }
 
 int get_glow_channel(int obj) {
-    int id = objects.id[obj];
-    if (object_fades(id)) {
-        if (objects.opacity[obj] < 0.8f || state.dead) {
-            return CHANNEL_LBG_NOLERP;
-        } else {
-            return CHANNEL_INVISIBLE_GLOW;
-        }
+    if (object_fades(obj)) {
+        return CHANNEL_INVISIBLE_GLOW;
     }
 
+    int id = objects.id[obj];
     switch (id) {
         case 143:
         case 177:
@@ -1162,17 +1158,21 @@ void create_objects() {
                 Color p1 = get_white_if_black(p1_color);
                 float opacity = objects.opacity[obj->obj];
 
-                float blendFactor = 1.9f - 1.5f * opacity;
-                float oneMinusFactor = 1.0f - blendFactor;
+                if (opacity < 0.8f || state.dead) {
+                    col = channels[CHANNEL_LBG_NOLERP];
+                } else {
+                    float blendFactor = 1.9f - 1.5f * opacity;
+                    float oneMinusFactor = 1.0f - blendFactor;
 
-                int r = (float)p1.r * oneMinusFactor + (float)lbg.r * blendFactor;
-                int g = (float)p1.g * oneMinusFactor + (float)lbg.g * blendFactor;
-                int b = (float)p1.b * oneMinusFactor + (float)lbg.b * blendFactor;
-                
-                col.color.r = CLAMP(r, 0, 255);
-                col.color.g = CLAMP(g, 0, 255);
-                col.color.b = CLAMP(b, 0, 255);
-                col.blending = true;
+                    int r = (float)p1.r * oneMinusFactor + (float)lbg.r * blendFactor;
+                    int g = (float)p1.g * oneMinusFactor + (float)lbg.g * blendFactor;
+                    int b = (float)p1.b * oneMinusFactor + (float)lbg.b * blendFactor;
+                    
+                    col.color.r = CLAMP(r, 0, 255);
+                    col.color.g = CLAMP(g, 0, 255);
+                    col.color.b = CLAMP(b, 0, 255);
+                    col.blending = true;
+                }
             } else {
                 col = channels[col_channel];
             }
