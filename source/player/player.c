@@ -310,7 +310,7 @@ void ball_gamemode(Player *player) {
     }
     
     drag_particles[state.current_player].emitterX = player->x;
-    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -4 : 4);
+    drag_particles[state.current_player].emitterY = fabsf(gravBottom(player)) + (player->upside_down ? -2 : 2);
     drag_particles[state.current_player].emitting = player->on_ground || player->on_ceiling;
 
     drag_particles[state.current_player].gravityFlipped = player->upside_down;
