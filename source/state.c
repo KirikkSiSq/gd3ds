@@ -277,6 +277,7 @@ void init_variables() {
     level_info.completing = false;
 
     init_player(&state.player);
+    init_player(&state.player2);
 
     init_state();
 
