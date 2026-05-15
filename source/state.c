@@ -147,27 +147,47 @@ void set_mini(Player *player, bool mini) {
     set_hitbox_size(player, player->gamemode);
 }
 
-void init_variables() {
-    level_frame = 0;
+void clear_snap_data(Player *player) {
+    player->snap_data.snapped_obj = -1;
+    player->snap_data.player_frame = 0;
+    player->snap_data.player_snap_diff = 0;
+    player->snap_data.object_id = -1;
+}
+
+void init_player(Player *player) {
+    memset(player, 0, sizeof(Player));
     
-    C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, 0);
+    set_gamemode(player, level_info.initial_gamemode);
+    set_mini(player, level_info.initial_mini);
 
-    Color used_p1 = (switchTrailColor ? p1_color : p2_color);
-    Color used_p2 = (switchTrailColor ? p2_color : p1_color);
+    player->cutscene_timer = 0;
+    player->x = 0;
+    player->y = player->height / 2;
+    player->vel_x = player_speeds[state.speed];  
+    player->vel_y = 0;
+    player->new_vel_y = __FLT_MAX__;
+    player->frame = 0;
 
-    C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
-    MotionTrail_Init(&trail_p1, 0.3f, 3, 10.0f, false, true, used_p1, img);
-    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, true, used_p2, img);
+    player->on_ground = true;
+    player->on_ceiling = false;
+    player->inverse_rotation = false;
+    player->upside_down = level_info.initial_upsidedown;
+    player->timeElapsed = 0.f;
 
-    used_p1 = (switchWaveTrailColor ? p1_color : p2_color);
-    used_p2 = (switchWaveTrailColor ? p2_color : p1_color);
-    
-    MotionTrail_Init(&wave_trail_p1, 3.f, 3, 10.0f, true, (used_p1.r | used_p1.g | used_p1.b && !solidWaveTrail), used_p1, img);
-    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, (used_p2.r | used_p2.g | used_p2.b && !solidWaveTrail), used_p2, img);
-    MotionTrail_StopStroke(&trail_p1);
-    MotionTrail_StopStroke(&trail_p2);
+    player->internal_hitbox.height = 9;
+    player->internal_hitbox.width = 9;
 
-    clear_use_effects(GFX_TOP);
+    player->cutscene_initial_player_x = 0;
+    player->cutscene_initial_player_y = 0;
+
+    player->p1_trail_pos = 0;
+
+    clear_slope_data(player);
+    clear_snap_data(player);
+}
+
+void init_state() {
+    state.current_player = 0;
 
     state.camera_wall_timer = 0;
     state.camera_wall_initial_y = 0;
@@ -179,59 +199,20 @@ void init_variables() {
     state.mirror_speed_factor = 1.f;
     state.mirror_mult = 1;
 
-    state.hitboxesTempEnabled = false;
-
-    current_fading_effect = FADE_NONE;
-    memset(&state.player.p1_trail_data, 0, sizeof(P1Trail) * P1_TRAIL_LENGTH);
-    memset(&state.player.snap_data, 0, sizeof(SnapData));
-    state.player.snap_data.snapped_obj = -1;
-    state.player.snap_data.object_id = -1;
-
-    state.player.p1_trail_pos = 0;
-    p1_trail = false;
+    state.hitbox_enabled_when_dead = false;
     state.death_timer = 0.f;
-
-    level_info.completing = false;
-    
-    memset(&state.player, 0, sizeof(Player));
-    //memset(&state.hitbox_trail_players, 0, sizeof(state.hitbox_trail_players));
-    //state.last_hitbox_trail = 0;
 
     state.dual = false;
     state.dead = false;
     state.mirror_mult = 1;
-
-    Player *player = &state.player;
-    clear_slope_data(player);
-    player->cutscene_timer = 0;
-    player->width = 30;
-    player->height = 30;
     state.speed = level_info.initial_speed;
-    player->x = 0;
-    player->y = player->height / 2;
-    player->vel_x = player_speeds[state.speed];  
-    player->vel_y = 0;
-    player->new_vel_y = __FLT_MAX__;
-    player->frame = 0;
     state.ground_y = 0;
     state.ceiling_y = 999999;
+    
+    state.hitbox_enabled_when_dead = false;
+}
 
-    state.current_player = 0;
-
-    set_gamemode(player, level_info.initial_gamemode);
-    player->on_ground = true;
-    player->on_ceiling = false;
-    player->inverse_rotation = false;
-    set_mini(player, level_info.initial_mini);
-    player->upside_down = level_info.initial_upsidedown;
-    player->timeElapsed = 0.f;
-
-    player->internal_hitbox.height = 9;
-    player->internal_hitbox.width = 9;
-
-    player->cutscene_initial_player_x = 0;
-    player->cutscene_initial_player_y = 0;
-
+void init_level_bounds() {
     switch (level_info.initial_gamemode) {
         case GAMEMODE_SHIP:
         case GAMEMODE_BIRD:
@@ -263,12 +244,45 @@ void init_variables() {
     float playable_height = state.ceiling_y - state.ground_y;
     float calc_height = 0;
 
-    if (player->gamemode != GAMEMODE_PLAYER || state.dual) {
+    if (state.player.gamemode != GAMEMODE_PLAYER || state.dual) {
         calc_height = (SCREEN_HEIGHT_AREA - playable_height) / 2;
     }
-
+    
     state.ground_y_gfx = calc_height; 
-    state.hitboxesTempEnabled = false;
+}
+
+void init_variables() {
+    level_frame = 0;
+    
+    C2D_Image img = C2D_SpriteSheetGetImage(trailSheet, 0);
+
+    Color used_p1 = (switchTrailColor ? p1_color : p2_color);
+    Color used_p2 = (switchTrailColor ? p2_color : p1_color);
+
+    C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
+    MotionTrail_Init(&trail_p1, 0.3f, 3, 10.0f, false, true, used_p1, img);
+    MotionTrail_Init(&trail_p2, 0.3f, 3, 10.0f, false, true, used_p2, img);
+
+    used_p1 = (switchWaveTrailColor ? p1_color : p2_color);
+    used_p2 = (switchWaveTrailColor ? p2_color : p1_color);
+    
+    MotionTrail_Init(&wave_trail_p1, 3.f, 3, 10.0f, true, (used_p1.r | used_p1.g | used_p1.b && !solidWaveTrail), used_p1, img);
+    MotionTrail_Init(&wave_trail_p2, 3.f, 3, 10.0f, true, (used_p2.r | used_p2.g | used_p2.b && !solidWaveTrail), used_p2, img);
+    MotionTrail_StopStroke(&trail_p1);
+    MotionTrail_StopStroke(&trail_p2);
+
+    clear_use_effects(GFX_TOP);
+
+    current_fading_effect = FADE_NONE;
+    level_info.completing = false;
+
+    init_player(&state.player);
+
+    init_state();
+
+    init_level_bounds();
+
+    p1_trail = false;
 
     clear_bg_flash();
 }
@@ -301,7 +315,7 @@ void handle_death() {
     spawnMultipleParticles(&explosion_particles[state.current_player], 90);
     
     if (hitboxesOnDeath) {
-        state.hitboxesTempEnabled = true;
+        state.hitbox_enabled_when_dead = true;
     }
 }
 
@@ -319,6 +333,7 @@ void handle_bg_flash() {
     BGFlashData *data = &state.flash_data;
     if (!data->flashing) return;
 
+    // Run flashing state
     switch (data->state) {
         case FLASH_NONE:
             break;
@@ -342,6 +357,7 @@ void handle_bg_flash() {
         case FLASH_SECOND_LIGHT:
             data->timer -= STEPS_DT;
             if (data->timer <= 0) {
+                // End flash
                 data->state = FLASH_NONE;
                 data->timer = 0;
                 data->use_lbg = false;

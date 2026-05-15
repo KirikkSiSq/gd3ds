@@ -4,8 +4,25 @@
 
 #include <float.h>
 
+Vec2D add_vec(Vec2D a, Vec2D b) {
+    return (Vec2D) { a.x + b.x, a.y + b.y};
+}
+
+Vec2D sub_vec(Vec2D a, Vec2D b) {
+    return (Vec2D) { a.x - b.x, a.y - b.y};
+}
+
+Vec2D multiply_vec(Vec2D v, float val) {
+    return (Vec2D) { v.x * val, v.y * val};
+}
+
+float len_vec(Vec2D v) {
+    return sqrtf(v.x*v.x + v.y*v.y);
+}
+
 Vec2D normalize(Vec2D v) {
-    float len = sqrtf(v.x*v.x + v.y*v.y);
+    float len = len_vec(v);
+    if (len < 0.0001f) len = 1.f;
     return (Vec2D){ v.x / len, v.y / len };
 }
 
@@ -17,6 +34,11 @@ Vec2D perpendicular(Vec2D v) {
     return (Vec2D){ -v.y, v.x };
 }
 
+float square_dist_vec(const Vec2D* a, const Vec2D* b) {
+    float dx = a->x - b->x;
+    float dy = a->y - b->y;
+    return dx*dx + dy*dy;
+}
 
 float clampf(float d, float min, float max) {
     const float t = d < min ? min : d;
@@ -64,6 +86,7 @@ float slerp(float a, float b, float ratio) {
 	return a + delta * clampf(ratio, 0.f, 1.f);
 }
 
+// GD's slerp
 float slerp_fancy(float fromAngle, float toAngle, float t) {
     float fromHalf = fromAngle * 0.5f;
     float toHalf   = toAngle   * 0.5f;

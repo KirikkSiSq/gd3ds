@@ -19,9 +19,17 @@
 
 #define STEPS_HZ 240
 
+// Vector math
+Vec2D add_vec(Vec2D a, Vec2D b);
+Vec2D sub_vec(Vec2D a, Vec2D b);
+Vec2D multiply_vec(Vec2D v, float val);
 Vec2D normalize(Vec2D v);
+float len_vec(Vec2D v);
 float dot_vec(Vec2D a, Vec2D b);
 Vec2D perpendicular(Vec2D v);
+float square_dist_vec(const Vec2D* a, const Vec2D* b);
+
+
 float clampf(float d, float min, float max);
 float positive_fmodf(float n, float divisor);
 Color color_lerp(Color color1, Color color2, float fraction);

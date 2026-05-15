@@ -415,7 +415,7 @@ void game_loop() {
             } else hitboxesEnabled = true;
         }      
 
-        if (hitboxesEnabled || state.hitboxesTempEnabled) state.hitbox_display = 1;
+        if (hitboxesEnabled || state.hitbox_enabled_when_dead) state.hitbox_display = 1;
         
         if (hitboxTrail) {
             hitboxesEnabled = true;
@@ -663,11 +663,11 @@ void game_loop() {
 
                     // When mirror transition ends, put a wave trail point
                     if (state.player.gamemode == GAMEMODE_DART) {
-                        wave_trail_p1.positionR = (Vec2){ state.player.x, state.player.y };
+                        wave_trail_p1.positionR = (Vec2D){ state.player.x, state.player.y };
                         MotionTrail_AddWavePoint(&wave_trail_p1);
                     }
                     if (state.dual && state.player2.gamemode == GAMEMODE_DART) {
-                        wave_trail_p2.positionR = (Vec2){ state.player2.x, state.player2.y };
+                        wave_trail_p2.positionR = (Vec2D){ state.player2.x, state.player2.y };
                         MotionTrail_AddWavePoint(&wave_trail_p2);
                     }
                 }

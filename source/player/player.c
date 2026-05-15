@@ -91,7 +91,7 @@ void update_rotation_direction(Player *player) {
 void cube_gamemode(Player *player) {
     int mult = player->rotation_direction;
     
-    trail->positionR = (Vec2){player->x, player->y};  
+    trail->positionR = (Vec2D){player->x, player->y};  
     trail->startingPositionInitialized = true;
 
     player->gravity = cube_accelerations[state.speed];
@@ -230,7 +230,7 @@ void ship_gamemode(Player *player) {
     float x = player->x + rot_x * scale;
     float y = player->y + rot_y * scale;
     
-    trail->positionR = (Vec2){x, y};  
+    trail->positionR = (Vec2D){x, y};  
     trail->startingPositionInitialized = true;
     float calc_x = player->x - state.camera_x;
     float calc_y = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.camera_y);
@@ -304,7 +304,7 @@ static float ballJumpHeights[SPEED_COUNT] = {
 };
 
 void ball_gamemode(Player *player) {
-    trail->positionR = (Vec2){player->x, player->y};  
+    trail->positionR = (Vec2D){player->x, player->y};  
     trail->startingPositionInitialized = true;
 
     int mult = (player->upside_down ? -1 : 1);
@@ -375,7 +375,7 @@ void ufo_gamemode(Player *player) {
     float calc_x = player->x - state.camera_x;
     float calc_y = SCREEN_HEIGHT - (fabsf(gravBottom(player)) - state.camera_y);
 
-    trail->positionR = (Vec2){x, y};  
+    trail->positionR = (Vec2D){x, y};  
     trail->startingPositionInitialized = true;
 
     secondary_particles[state.current_player].emitterX = player->x;
@@ -474,7 +474,7 @@ void wave_gamemode(Player *player) {
     float x = player->x + rot_x * scale;
     float y = player->y + rot_y * scale;
     
-    trail->positionR = (Vec2){x, y};  
+    trail->positionR = (Vec2D){x, y};  
     trail->startingPositionInitialized = true;
  
     if (player->cutscene_timer == 0 && !state.mirroring) wave_trail->opacity = 1.f;
@@ -682,7 +682,7 @@ void run_player(Player *player) {
 
     // Handle wave trail point adding
     if (player->gamemode == GAMEMODE_DART && !state.mirroring) {    
-        wave_trail->positionR = (Vec2){player->x, player->y};  
+        wave_trail->positionR = (Vec2D){player->x, player->y};  
         wave_trail->startingPositionInitialized = true;
         if (player->vel_y != state.old_player.vel_y || player->on_ground != state.old_player.on_ground || player->on_ceiling != state.old_player.on_ceiling) {
             MotionTrail_AddWavePoint(wave_trail);

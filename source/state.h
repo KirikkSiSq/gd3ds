@@ -103,7 +103,7 @@ typedef struct {
     float timer;
     float death_timer;
 
-    bool hitboxesTempEnabled;
+    bool hitbox_enabled_when_dead;
 
     bool custom_level;
     char custom_level_path[256];

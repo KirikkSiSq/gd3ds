@@ -16,141 +16,82 @@
 #include "utils/gfx.h"
 
 // Adds "thickness" to a line strip by generating a triangle strip
-void ccVertexLineToPolygon(const Vec2* points, float stroke, Vec2* outVerts, int offset, int count) {
-    if (count <= 0) return;
-
-    float halfStroke = stroke / 2.0f;
-
-    for (int i = offset; i < count; ++i) {
-        Vec2 p = points[i];
-        Vec2 dir;
-
-        if (i == 0) {
-            dir.x = points[i + 1].x - p.x;
-            dir.y = points[i + 1].y - p.y;
-        } else if (i == count - 1) {
-            dir.x = p.x - points[i - 1].x;
-            dir.y = p.y - points[i - 1].y;
-        } else {
-            dir.x = points[i + 1].x - points[i - 1].x;
-            dir.y = points[i + 1].y - points[i - 1].y;
-        }
-
-        // Normalize direction
-        float len = sqrtf(dir.x * dir.x + dir.y * dir.y);
-        if (len == 0) len = 1.0f;
-        dir.x /= len;
-        dir.y /= len;
-
-        // Perpendicular vector
-        Vec2 perp;
-        perp.x = -dir.y;
-        perp.y = dir.x;
-
-        // Offset left and right
-        outVerts[i * 2].x     = p.x + perp.x * halfStroke;
-        outVerts[i * 2].y     = p.y + perp.y * halfStroke;
-
-        outVerts[i * 2 + 1].x = p.x - perp.x * halfStroke;
-        outVerts[i * 2 + 1].y = p.y - perp.y * halfStroke;
-    }
-}
-// Adds "vertical thickness" to a line strip by generating a triangle strip
-void ccVertexLineToPolygonWave(const Vec2* points, float stroke, Vec2* outVerts, int offset, int count) {
+void ccVertexLineToPolygon(const Vec2D* points, float stroke, Vec2D* outVerts, int offset, int count) {
     if (count < 2) return;
 
     float halfStroke = stroke * 0.5f;
 
     for (int i = offset; i < count; ++i) {
-        Vec2 p = points[i];
+        Vec2D p = points[i];
+        Vec2D dir;
 
-        Vec2 perp;
+        // Get direction
+        if (i == 0) {
+            dir = sub_vec(points[i + 1], p);
+        } else if (i == count - 1) {
+            dir = sub_vec(p, points[i - 1]);
+        } else {
+            dir = sub_vec(points[i + 1], points[i - 1]);
+        }
+
+        // Normalize direction
+        dir = normalize(dir);
+
+        // Perpendicular vector
+        Vec2D perp = perpendicular(dir);
+
+        // Offset left and right
+        outVerts[i * 2]     = add_vec(p, multiply_vec(perp, halfStroke));
+        outVerts[i * 2 + 1] = sub_vec(p, multiply_vec(perp, halfStroke));
+    }
+}
+// Adds "vertical thickness" to a line strip by generating a triangle strip
+void ccVertexLineToPolygonWave(const Vec2D* points, float stroke, Vec2D* outVerts, int offset, int count) {
+    if (count < 2) return;
+
+    float halfStroke = stroke * 0.5f;
+
+    for (int i = offset; i < count; ++i) {
+        Vec2D p = points[i];
+
+        Vec2D perp;
 
         if (i == 0) {
-            Vec2 dir = {
-                points[1].x - p.x,
-                points[1].y - p.y
-            };
+            Vec2D dir = sub_vec(points[1], p);
 
-            float len = sqrtf(dir.x * dir.x + dir.y * dir.y);
+            dir = normalize(dir);
+            perp = perpendicular(dir);
 
-            if (len < 0.0001f)
-                len = 1.0f;
-
-            dir.x /= len;
-            dir.y /= len;
-
-            perp.x = -dir.y;
-            perp.y =  dir.x;
-
-            outVerts[i * 2].x     = p.x + perp.x * halfStroke;
-            outVerts[i * 2].y     = p.y + perp.y * halfStroke;
-
-            outVerts[i * 2 + 1].x = p.x - perp.x * halfStroke;
-            outVerts[i * 2 + 1].y = p.y - perp.y * halfStroke;
+            outVerts[i * 2]     = add_vec(p, multiply_vec(perp, halfStroke));
+            outVerts[i * 2 + 1] = sub_vec(p, multiply_vec(perp, halfStroke));
         } else if (i == count - 1) {
-            Vec2 dir = {
-                p.x - points[i - 1].x,
-                p.y - points[i - 1].y
-            };
+            Vec2D dir = sub_vec(p, points[i - 1]);
 
-            float len = sqrtf(dir.x * dir.x + dir.y * dir.y);
+            dir = normalize(dir);
+            perp = perpendicular(dir);
 
-            if (len < 0.0001f)
-                len = 1.0f;
-
-            dir.x /= len;
-            dir.y /= len;
-
-            perp.x = -dir.y;
-            perp.y =  dir.x;
-
-            outVerts[i * 2].x     = p.x + perp.x * halfStroke;
-            outVerts[i * 2].y     = p.y + perp.y * halfStroke;
-
-            outVerts[i * 2 + 1].x = p.x - perp.x * halfStroke;
-            outVerts[i * 2 + 1].y = p.y - perp.y * halfStroke;
+            outVerts[i * 2]     = add_vec(p, multiply_vec(perp, halfStroke));
+            outVerts[i * 2 + 1] = sub_vec(p, multiply_vec(perp, halfStroke));
         } else {
             // Previous segment direction
-            Vec2 dirA = {
-                p.x - points[i - 1].x,
-                p.y - points[i - 1].y
-            };
+            Vec2D dirA = sub_vec(p, points[i - 1]); 
 
             // Next segment direction
-            Vec2 dirB = {
-                points[i + 1].x - p.x,
-                points[i + 1].y - p.y
-            };
+            Vec2D dirB = sub_vec(points[i + 1], p);
 
-            float lenA = sqrtf(dirA.x * dirA.x + dirA.y * dirA.y);
-            float lenB = sqrtf(dirB.x * dirB.x + dirB.y * dirB.y);
-
-            if (lenA < 0.0001f) lenA = 1.0f;
-            if (lenB < 0.0001f) lenB = 1.0f;
-
-            dirA.x /= lenA;
-            dirA.y /= lenA;
-
-            dirB.x /= lenB;
-            dirB.y /= lenB;
+            // Normalize
+            dirA = normalize(dirA);
+            dirB = normalize(dirB);
 
             // Normals
-            Vec2 nA = {
-                -dirA.y,
-                 dirA.x
-            };
-
-            Vec2 nB = {
-                -dirB.y,
-                 dirB.x
-            };
+            Vec2D nA = perpendicular(dirA);
+            Vec2D nB = perpendicular(dirB);
 
             // Average normals
             perp.x = nA.x + nB.x;
             perp.y = nA.y + nB.y;
 
-            float perpLen = sqrtf(perp.x * perp.x + perp.y * perp.y);
+            float perpLen = len_vec(perp);
 
             // Nearly opposite directions
             if (perpLen < 0.0001f) {
@@ -161,7 +102,7 @@ void ccVertexLineToPolygonWave(const Vec2* points, float stroke, Vec2* outVerts,
             perp.x /= perpLen;
             perp.y /= perpLen;
 
-            float dot = dirA.x * dirB.x + dirA.y * dirB.y;
+            float dot = dot_vec(dirA, dirB);
 
             // Prevent division explosions
             float denom = sqrtf(fmaxf((1.0f + dot) * 0.5f, 0.2f));
@@ -174,19 +115,10 @@ void ccVertexLineToPolygonWave(const Vec2* points, float stroke, Vec2* outVerts,
 
             float finalStroke = halfStroke * miterScale;
 
-            outVerts[i * 2].x     = p.x + perp.x * finalStroke;
-            outVerts[i * 2].y     = p.y + perp.y * finalStroke;
-
-            outVerts[i * 2 + 1].x = p.x - perp.x * finalStroke;
-            outVerts[i * 2 + 1].y = p.y - perp.y * finalStroke;
+            outVerts[i * 2]     = add_vec(p, multiply_vec(perp, finalStroke));
+            outVerts[i * 2 + 1] = sub_vec(p, multiply_vec(perp, finalStroke));
         }
     }
-}
-
-static float getDistanceSq(const Vec2* a, const Vec2* b) {
-    float dx = a->x - b->x;
-    float dy = a->y - b->y;
-    return dx*dx + dy*dy;
 }
 
 void MotionTrail_Clear(MotionTrail *trail) {
@@ -284,8 +216,8 @@ void MotionTrail_Update(MotionTrail* trail, float delta) {
     if (trail->nuPoints >= trail->maxPoints) {
         append = false;
     } else if (trail->nuPoints > 0) {
-        bool a1 = getDistanceSq(&trail->pointVertexes[trail->nuPoints - 1], &trail->positionR) < trail->minSeg;
-        bool a2 = (trail->nuPoints == 1) ? false : getDistanceSq(&trail->pointVertexes[trail->nuPoints - 2], &trail->positionR) < (trail->minSeg * 2.0f);
+        bool a1 = square_dist_vec(&trail->pointVertexes[trail->nuPoints - 1], &trail->positionR) < trail->minSeg;
+        bool a2 = (trail->nuPoints == 1) ? false : square_dist_vec(&trail->pointVertexes[trail->nuPoints - 2], &trail->positionR) < (trail->minSeg * 2.0f);
         if (a1 || a2) append = false;
     }
 
@@ -410,9 +342,9 @@ void MotionTrail_Draw(MotionTrail* trail) {
         int i1 = i + 1;
         int i2 = i + 2;
 
-        Vec2 p0 = trail->vertices[i0];
-        Vec2 p1 = trail->vertices[i1];
-        Vec2 p2 = trail->vertices[i2];
+        Vec2D p0 = trail->vertices[i0];
+        Vec2D p1 = trail->vertices[i1];
+        Vec2D p2 = trail->vertices[i2];
 
         float x0 = get_mirror_x((p0.x - state.camera_x), state.mirror_factor);
         float y0 = SCREEN_HEIGHT - ((p0.y - state.camera_y));
@@ -478,9 +410,9 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
         int i1 = i + 1;
         int i2 = i + 2;
 
-        Vec2 p0 = trail->vertices[i0];
-        Vec2 p1 = trail->vertices[i1];
-        Vec2 p2 = trail->vertices[i2];
+        Vec2D p0 = trail->vertices[i0];
+        Vec2D p1 = trail->vertices[i1];
+        Vec2D p2 = trail->vertices[i2];
 
         float x0 = get_mirror_x((p0.x - state.camera_x), state.mirror_factor);
         float y0 = SCREEN_HEIGHT - ((p0.y - state.camera_y));
@@ -507,9 +439,9 @@ void MotionTrail_DrawWaveTrail(MotionTrail *trail) {
         int i1 = i + 1;
         int i2 = i + 2;
 
-        Vec2 p0 = trail->centerVertices[i0];
-        Vec2 p1 = trail->centerVertices[i1];
-        Vec2 p2 = trail->centerVertices[i2];
+        Vec2D p0 = trail->centerVertices[i0];
+        Vec2D p1 = trail->centerVertices[i1];
+        Vec2D p2 = trail->centerVertices[i2];
 
         float x0 = get_mirror_x((p0.x - state.camera_x), state.mirror_factor);
         float y0 = SCREEN_HEIGHT - ((p0.y - state.camera_y));

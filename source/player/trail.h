@@ -6,13 +6,10 @@
 #include <citro2d.h>
 #include "objects.h"
 #include "color_channels.h"
+#include "main.h"
 
 #define MAX_TRAIL_POINTS 128
 #define TRAIL_CLEAR_DISTANCE 30.f
-
-typedef struct {
-    float x, y;
-} Vec2;
 
 typedef struct {
     float u, v;
@@ -34,20 +31,20 @@ typedef struct {
     float minSeg;
     float stroke;
 
-    Vec2 positionR;
+    Vec2D positionR;
     Color color;
 
     C2D_Image image;
 
     float pointState[MAX_TRAIL_POINTS];
-    Vec2 pointVertexes[MAX_TRAIL_POINTS];
-    Vec2 vertices[MAX_TRAIL_POINTS * 2];
+    Vec2D pointVertexes[MAX_TRAIL_POINTS];
+    Vec2D vertices[MAX_TRAIL_POINTS * 2];
     u8 opacities[MAX_TRAIL_POINTS * 2];
     Tex2F texCoords[MAX_TRAIL_POINTS * 2];
     
-    Vec2 centerVertices[MAX_TRAIL_POINTS * 2];
+    Vec2D centerVertices[MAX_TRAIL_POINTS * 2];
 
-    Vec2 lastStopPosition;
+    Vec2D lastStopPosition;
     bool wasStopped;
     bool blending;
 } MotionTrail;

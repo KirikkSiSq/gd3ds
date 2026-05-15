@@ -928,6 +928,7 @@ int parse_gd_object(const char *objStr, int obj) {
     if (is_valid_object(obj_id)) {
         const GameObject *game_object = &game_objects[objects.id[obj]];
 
+        // Get proper color channels
         if (game_object->swap_base_detail) {
             if (!obj_has_main(game_object)) {
                 if (!objects.col_channel[obj]) objects.col_channel[obj] = game_object->base_color;
@@ -939,6 +940,7 @@ int parse_gd_object(const char *objStr, int obj) {
             if (!objects.detail_col_channel[obj]) objects.detail_col_channel[obj] = 1;
         }
 
+        // Give each object its own random value
         objects.random[obj] = rand();
 
         const ObjectHitbox *hitbox = game_object->hitbox;
@@ -946,6 +948,7 @@ int parse_gd_object(const char *objStr, int obj) {
             objects.width[obj] = hitbox->width;
             objects.height[obj] = hitbox->height;
             
+            // If object is and slope, calculate orientation
             if (hitbox->type == COLLISION_SLOPE) {
                 int orientation = objects.rotation[obj] / 90;
                 if (objects.flippedH[obj] && objects.flippedV[obj]) orientation += 2;
@@ -974,7 +977,7 @@ int parse_gd_object(const char *objStr, int obj) {
         if (objects.x[obj] > level_info.last_obj_x) {
             level_info.last_obj_x = objects.x[obj];
         }
-    } else if ((obj_id < 0 || obj_id >= GAME_OBJECT_COUNT) && obj_id != COL_TRIGGER) { // Do not replace 2.0 col trigger
+    } else if (obj_id != COL_TRIGGER) { // Do not replace 2.0 col trigger
         // Invalid object
         objects.id[obj] = 0;
     }
@@ -1111,7 +1114,7 @@ bool init_arrays(int count) {
     objects.collided = malloc(sizeof(u8) * count);
     if (!objects.collided) return false;
 
-
+    // Initialize the values
     memset(objects.random,             0, sizeof(int) * count);
     memset(objects.id,                 0, sizeof(int) * count);
     memset(objects.x,                  0, sizeof(float) * count);
@@ -1336,6 +1339,7 @@ int load_level(char *path) {
 
     load_level_info(level, data);
 
+    // Minimum size
     level_info.last_obj_x = 570.f;
 
     bool returned = parse_string(data);

@@ -819,7 +819,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                     }
                 }
 
-                wave_trail->positionR = (Vec2){player->x, player->y};  
+                wave_trail->positionR = (Vec2D){player->x, player->y};  
                 wave_trail->startingPositionInitialized = true;
                 MotionTrail_AddWavePoint(wave_trail);
 
@@ -842,7 +842,7 @@ void handle_special_hitbox(Player *player, int obj, const ObjectHitbox *hitbox) 
                 }
                 set_dual_bounds();
                 if (state.player2.gamemode == GAMEMODE_DART) {
-                    wave_trail_p2.positionR = (Vec2){state.player2.x, state.player2.y};  
+                    wave_trail_p2.positionR = (Vec2D){state.player2.x, state.player2.y};  
                     wave_trail_p2.startingPositionInitialized = true;
                     MotionTrail_AddWavePoint(&wave_trail_p2);
                 }

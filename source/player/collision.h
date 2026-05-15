@@ -2,10 +2,6 @@
 
 #include "player.h"
 
-typedef struct {
-    float x, y;
-} Vec2D;
-
 enum JumpType {
     JUMP_YELLOW_PAD,
     JUMP_YELLOW_ORB,
