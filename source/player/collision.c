@@ -221,7 +221,7 @@ void do_ball_reflection() {
                 if (player_1->on_ground || player_1->on_ceiling) {
                     state.current_player = 0;
 
-                    UseEffect *effect = add_use_effect(player_1->x, player_1->y, -1, &orb_collide_effect, GFX_TOP);
+                    UseEffect *effect = add_use_effect(player_1->x, player_1->y, USE_EFFECT_OBJ_P1, &orb_collide_effect, GFX_TOP);
                     if (effect) {
                         Color p1_white = get_white_if_black(p1_color);
                         effect->def.colorR = p1_white.r / 255.f;
@@ -234,7 +234,7 @@ void do_ball_reflection() {
                 } else if (player_2->on_ground || player_2->on_ceiling) {
                     state.current_player = 1;
 
-                    UseEffect *effect = add_use_effect(player_2->x, player_2->y, -1, &orb_collide_effect, GFX_TOP);
+                    UseEffect *effect = add_use_effect(player_2->x, player_2->y, USE_EFFECT_OBJ_P2, &orb_collide_effect, GFX_TOP);
                     if (effect) {
                         Color p2_white = get_white_if_black(p2_color);
                         effect->def.colorR = p2_white.r / 255.f;

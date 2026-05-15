@@ -186,6 +186,8 @@ UseEffect *add_use_effect(float x, float y, int obj, const UseEffectDefinition *
             // Struct copy
             effect->def = *def;
 
+            effect->obj = obj;
+
             effect->mid_rad = (effect->def.end_rad + effect->def.start_rad) / 2;
             effect->mid_opacity = (effect->def.end_opacity + effect->def.start_opacity) / 2;
 
@@ -277,15 +279,31 @@ void draw_use_effects(int screen) {
             float opacity = 1.f;
 
             // If stationary, dont convert to screen space
-            if (screen == GFX_TOP) {
-                float tmp_x = (x - state.camera_x);
-                float fade_scale = 1.f;
-                get_fade_vars(effect->obj, tmp_x, &fade_x, &fade_y, &fade_scale);
+            if (screen == GFX_TOP && effect->obj != USE_EFFECT_OBJ_NOTHING) {
+                // If obj is positive, it is an object, else it is a player
+                if (effect->obj >= 0) { // Obj
+                    float tmp_x = (x - state.camera_x);
+                    float fade_scale = 1.f;
+                    get_fade_vars(effect->obj, tmp_x, &fade_x, &fade_y, &fade_scale);
 
-                opacity = obj_edge_fade(tmp_x, SCREEN_WIDTH / SCALE) / 255.f;
+                    opacity = obj_edge_fade(tmp_x, SCREEN_WIDTH / SCALE) / 255.f;
 
-                x = get_mirror_x(tmp_x + fade_x, state.mirror_factor);
-                y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
+                    x = get_mirror_x(tmp_x + fade_x, state.mirror_factor);
+                    y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
+                } else { // Player
+                    float tmp_x;
+                    float tmp_y;
+                    if (effect->obj == USE_EFFECT_OBJ_P1) {
+                        tmp_x = state.player.x;
+                        tmp_y = state.player.y;
+                    } else { // P2
+                        tmp_x = state.player2.x;
+                        tmp_y = state.player2.y;
+                    }
+                    
+                    x = get_mirror_x(tmp_x - state.camera_x, state.mirror_factor);
+                    y = GSP_SCREEN_WIDTH - ((tmp_y - state.camera_y));
+                }
             }
 
             u32 color = C2D_Color32f(r, g, b, a * opacity);

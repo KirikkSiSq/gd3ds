@@ -645,7 +645,7 @@ void game_loop() {
             
             // If not dual, fade the p2 wave trial
             if (!state.dual) {
-                if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= (0.02f * 240) * delta;
+                if (wave_trail_p2.opacity > 0) wave_trail_p2.opacity -= (0.02f * STEPS_HZ) * delta;
                 
                 if (wave_trail_p2.opacity <= 0) {
                     wave_trail_p2.opacity = 0;

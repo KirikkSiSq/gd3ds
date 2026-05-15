@@ -4,6 +4,10 @@
 
 #define MAX_USE_EFFECTS 32
 
+#define USE_EFFECT_OBJ_NOTHING -3
+#define USE_EFFECT_OBJ_P2 -2
+#define USE_EFFECT_OBJ_P1 -1
+
 typedef struct {
     float duration;
 
