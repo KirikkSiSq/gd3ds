@@ -193,12 +193,10 @@ void slope_calc(int obj, Player *player) {
         }
 
         // On slope
-        if (gravBottom(player) != obj_gravTop(player, obj)) {
-            slope_snap_y(obj, player);
-        }
+        slope_snap_y(obj, player);
 
         // Sliding off slope
-        if (gravBottom(player) >= obj_gravTop(player, obj)) {
+        if (gravBottom(&state.old_player) >= obj_gravTop(player, obj)) {
             float vel = 0.9f * MIN(1.12f / slope_angle(obj, player), 1.54f) * (objects.height[obj] * player_speeds[state.speed] / objects.width[obj]);
             float time = clampf(10 * (player->timeElapsed - player->slope_data.elapsed), 0.4f, 1.0f);
             
@@ -221,6 +219,10 @@ void slope_calc(int obj, Player *player) {
             player->inverse_rotation = true;
             player->coyote_slope = player->slope_data;
             player->slope_slide_coyote_time = 2;
+
+            // This is stupid, but works!
+            player->x -= player->vel_x * STEPS_DT;
+            
             push_player_action(clear_slope_data);
         }
     } else if (orientation == ORIENT_NORMAL_DOWN) { // Normal - down
@@ -260,12 +262,11 @@ void slope_calc(int obj, Player *player) {
         }
 
         // On slope
-        if (gravBottom(player) != obj_gravTop(player, obj)) {
-            slope_snap_y(obj, player);
-        }
+        slope_snap_y(obj, player);
 
         // Sliding off slope
-        if (gravTop(player) <= obj_gravBottom(player, obj)) {
+        if (gravTop(&state.old_player) <= obj_gravBottom(player, obj)) {
+            //output_log("Tick %d - player %.2f, obj %.2f\n", player->frame, gravTop(player), obj_gravBottom(player, obj));
             float vel = 0.9f * MIN(1.12f / slope_angle(obj, player), 1.54f) * (objects.height[obj] * player_speeds[state.speed] / objects.width[obj]);
             float time = clampf(10 * (player->timeElapsed - player->slope_data.elapsed), 0.4f, 1.0f);
             
@@ -290,6 +291,11 @@ void slope_calc(int obj, Player *player) {
             player->coyote_slope = player->slope_data;
             player->slope_slide_coyote_time = 2;
             push_player_action(clear_slope_data);
+            
+            // This is stupid, but works!
+            player->x -= player->vel_x * STEPS_DT;
+
+            //output_log("Tick %d - Exit vel %.2f\n", player->frame, player->new_vel_y);
         }
     } else if (orientation == ORIENT_UD_DOWN) { // Upside down - down
         // Handle leaving slope
@@ -582,7 +588,7 @@ void slope_collide(int obj, Player *player) {
                 Player *other_player = (state.current_player == 0 ? &state.player2 : &state.player);
 
                 // Make both times synced if close enough
-                if (other_player->slope_data.slope_id >= 0 && fabsf(player->timeElapsed - other_player->slope_data.elapsed) < 0.10) {
+                if (state.dual && other_player->slope_data.slope_id >= 0 && fabsf(player->timeElapsed - other_player->slope_data.elapsed) < 0.10) {
                     player->slope_data.elapsed = other_player->slope_data.elapsed;
                 } else {
                     player->slope_data.elapsed = state.old_player.timeElapsed;
