@@ -17,7 +17,7 @@ extern int frame_skipped;
 #define P1_TRAIL_DURATION 0.45f
 #define P1_TRAIL_END_SCALE 0.8f
 
-#define BURST_PARTICLES_DURATION 0.15f
+#define BURST_PARTICLES_DURATION 0.10f
 
 #define DRAG_PARTICLES_FLOOR_DURATION 0.1f
 
