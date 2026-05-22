@@ -265,6 +265,10 @@ void game_loop() {
     normal_speed_particles.stationary = true;
     fast_speed_particles.stationary = true;
     faster_speed_particles.stationary = true;
+    slow_speed_particles.affectedByMirror = false;
+    normal_speed_particles.affectedByMirror = false;
+    fast_speed_particles.affectedByMirror = false;
+    faster_speed_particles.affectedByMirror = false;
 
     Color p1_not_white = get_white_if_black(p1_color);
     Color p2_not_white = get_white_if_black(p2_color);

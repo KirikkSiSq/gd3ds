@@ -27,6 +27,9 @@ static void copy_particle(ParticleData* d, int dst, int src) {
     d->posx[dst] = d->posx[src];
     d->posy[dst] = d->posy[src];
 
+    d->relx[dst] = d->relx[src];
+    d->rely[dst] = d->rely[src];
+
     d->dirX[dst] = d->dirX[src];
     d->dirY[dst] = d->dirY[src];
 
@@ -74,7 +77,7 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
     float angle = C3D_AngleFromDegrees(cfg->angle +
                   cfg->angleVariance * rand_minus1_1());
     
-                  // Position
+    // Position
     if (ps->posVarRotates) {
         float cosA = cosf(angle - C3D_AngleFromDegrees(90));
         float sinA = sinf(angle - C3D_AngleFromDegrees(90));
@@ -85,17 +88,19 @@ void initParticle(ParticleSystem* ps, const ParticleDefinition* cfg, int i) {
         float rotated_x = local_x * cosA - local_y * sinA;
         float rotated_y = local_x * sinA + local_y * cosA;
         
+        d->relx[i] = rotated_x * ps->scale;
+        d->rely[i] = rotated_y * ps->scale;
 
-        d->posx[i] = (ps->stationary ? 0 : ps->emitterX) + rotated_x * ps->scale;
-        d->posy[i] = (ps->stationary ? 0 : ps->emitterY) + rotated_y * ps->scale;
+        d->posx[i] = d->relx[i] + ps->emitterX;
+        d->posy[i] = d->rely[i] + ps->emitterY;
     } else {
-        
-        d->posx[i] = (ps->stationary ? 0 : ps->emitterX) +
-                    cfg->sourcePositionVariancex * rand_minus1_1() * ps->scale;
+        d->relx[i] = cfg->sourcePositionVariancex * rand_minus1_1() * ps->scale;
+        d->rely[i] = cfg->sourcePositionVariancey * rand_minus1_1() * ps->scale;
 
-        d->posy[i] = (ps->stationary ? 0 : ps->emitterY) +
-                    cfg->sourcePositionVariancey * rand_minus1_1() * ps->scale;
+        d->posx[i] = d->relx[i] + ps->emitterX;
+        d->posy[i] = d->rely[i] + ps->emitterY;
     }
+
     
     float speed = (cfg->speed +
                   cfg->speedVariance * rand_minus1_1()) * ps->scale;
@@ -271,8 +276,8 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
 
     if (ps->cfg.emitterType == 0) { // Gravity Mode (Mode A)
         for (int i = 0; i < count; i++) {
-            float px = d->posx[i] - ps->emitterX;
-            float py = d->posy[i] - ps->emitterY;
+            float px = d->relx[i];
+            float py = d->rely[i];
 
             float radialX = 0.0f;
             float radialY = 0.0f;
@@ -301,6 +306,9 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
 
             d->posx[i] += d->dirX[i] * dt;
             d->posy[i] += d->dirY[i] * dt;
+
+            d->relx[i] += d->dirX[i] * dt;
+            d->rely[i] += d->dirY[i] * dt;
         }
     } else { // Radial mode (Mode B)
         // update angle
@@ -315,11 +323,13 @@ void updateParticleSystem(ParticleSystem* ps, float dt) {
 
         // convert polar -> cartesian
         for (int i = 0; i < count; i++) {
-            d->posx[i] = ps->emitterX + -cosf(d->angle[i]) * d->radius[i];
+            d->relx[i] = -cosf(d->angle[i]) * d->radius[i];
+            d->posx[i] = ps->emitterX + d->relx[i];
         }
 
         for (int i = 0; i < count; i++) {
-            d->posy[i] = ps->emitterY + -sinf(d->angle[i]) * d->radius[i];
+            d->rely[i] = -sinf(d->angle[i]) * d->radius[i];
+            d->posy[i] = ps->emitterY + d->rely[i];
         }
     }
 
@@ -360,6 +370,9 @@ void initParticleData(ParticleData* d, int capacity) {
 
     d->posx = alloc_array(capacity);
     d->posy = alloc_array(capacity);
+
+    d->relx = alloc_array(capacity);
+    d->rely = alloc_array(capacity);
 
     d->dirX = alloc_array(capacity);
     d->dirY = alloc_array(capacity);
@@ -406,6 +419,8 @@ void initParticleSystem(ParticleSystem* ps, const ParticleDefinition* cfg) {
     ps->emitterX = cfg->sourcePositionx;
     ps->emitterY = cfg->sourcePositiony;
     ps->scale = 1.0f;
+    ps->posVarRotates = false;
+    ps->affectedByMirror = true;
 
     ps->emitCounter = 0.0f;
 
@@ -433,6 +448,9 @@ void freeParticleData(ParticleData* d) {
 
     free(d->posx);
     free(d->posy);
+
+    free(d->relx);
+    free(d->rely);
 
     free(d->dirX);
     free(d->dirY);
@@ -489,12 +507,16 @@ void drawParticleSystem(ParticleSystem* ps, float x_offset, float y_offset, floa
                 x = ((x - state.camera_x));
                 y = GSP_SCREEN_WIDTH - ((y - state.camera_y));  
             } else {
-                x += ps->emitterX;
-                y += ps->emitterY;
+                x = d->relx[i] + ps->emitterX;
+                y = d->rely[i] + ps->emitterY;
             }
 
-            // Apply mirror
-            x = get_mirror_x(x + x_offset, state.mirror_factor);
+            if (ps->affectedByMirror) {
+                // Apply mirror
+                x = get_mirror_x(x + x_offset, state.mirror_factor);
+            } else {
+                x += x_offset;
+            }
         } else {
             // Flip
             x += x_offset;

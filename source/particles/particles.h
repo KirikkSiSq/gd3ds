@@ -14,6 +14,9 @@ typedef struct {
     float* posx;
     float* posy;
 
+    float* relx;
+    float* rely;
+
     float* dirX;
     float* dirY;
 
@@ -64,6 +67,7 @@ typedef struct {
 
     float scale;
 
+    bool affectedByMirror;
     bool stationary;
     bool relativeStationary;
     bool gravityFlipped;
