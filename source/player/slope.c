@@ -28,6 +28,7 @@ int get_player_touching_slopes(Player *player) {
     int sy = (int)(player->y / SECTION_SIZE);
 
     int count = 0;
+    int slope = player->slope_data.slope_id;
     
     // Count slopes
     for (int dx = -1; dx <= 1; dx++) {
@@ -51,11 +52,22 @@ int get_player_touching_slopes(Player *player) {
                     );
                     
                     if (colliding && slope_touching(obj, player)) {
-                        int slope = player->slope_data.slope_id;
                         if (slope >= 0) {
-                            if ((grav_slope_orient(slope, player) == grav_slope_orient(obj, player) && 
+                            // Check if this would be the next slope if the next slope is higher than the current one
+                            float diff = objects.y[obj] - objects.y[slope];
+                            int orient = objects.orientation[slope];
+
+                            bool would_be_next;
+
+                            if (orient == ORIENT_NORMAL_UP || orient == ORIENT_UD_DOWN) {
+                                would_be_next = diff > 0;
+                            } else {
+                                would_be_next = diff < 0;
+                            }
+                        
+                            if ((orient == grav_slope_orient(obj, player) && 
                                 slope_angle(slope, player) == slope_angle(obj, player) &&
-                                fabsf(objects.y[slope] - objects.y[obj]) > 15) || // Minimum distance
+                                would_be_next) ||
                                 slope == obj
                             ) {
                                 count++;
@@ -250,7 +262,7 @@ void slope_calc(int obj, Player *player) {
         if (gravBottom(player) != obj_gravTop(player, obj))
             slope_snap_y(obj, player);
 
-        output_log("Tick %d - NRM player %.2f, obj %.2f slopes %d\n", player->frame, gravBottom(player), obj_gravTop(player, obj), get_player_touching_slopes(player));
+        //output_log("Tick %d - NRM player %.2f, obj %.2f slopes %d\n", player->frame, gravBottom(player), obj_gravTop(player, obj), get_player_touching_slopes(player));
 
         // Sliding off slope
         if (gravBottom(player) >= obj_gravTop(player, obj) && get_player_touching_slopes(player) < 2) {
@@ -320,7 +332,7 @@ void slope_calc(int obj, Player *player) {
         if (gravBottom(player) != obj_gravTop(player, obj))
             slope_snap_y(obj, player);
 
-        output_log("Tick %d - UD player %.2f, obj %.2f slopes %d\n", player->frame, gravTop(player), obj_gravBottom(player, obj), get_player_touching_slopes(player));
+        //output_log("Tick %d - UD player %.2f, obj %.2f slopes %d\n", player->frame, gravTop(player), obj_gravBottom(player, obj), get_player_touching_slopes(player));
 
         // Sliding off slope
         if (gravTop(player) <= obj_gravBottom(player, obj) && get_player_touching_slopes(player) < 2) {

@@ -122,7 +122,7 @@ static void ensure_log_file(void) {
     char log_filename[278];
     snprintf(log_filename, sizeof(log_filename), "%s/%s", CONFIG_ROOT, "output.txt");
     
-    log_file = fopen(log_filename, "a");
+    log_file = fopen(log_filename, "w");
 }
 
 static void close_log_file(void) {
