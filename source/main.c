@@ -903,7 +903,7 @@ int main(int argc, char* argv[]) {
     if(ndspInit()) {
         no_dsp_firmware();
     }
-    
+
     required_loading_screen_assets_init();
 
     loading_screen_init();
@@ -933,7 +933,7 @@ int main(int argc, char* argv[]) {
 
     memset(&level_info, 0, sizeof(LoadedLevelInfo));
     
-    loading_screen_update(100);
+    loading_screen_update(90);
 
     u64 end = svcGetSystemTick();
     float loading_time = (end - start) / (CPU_TICKS_PER_MSEC) / 1000;
@@ -941,6 +941,7 @@ int main(int argc, char* argv[]) {
     // Wait a minimum of 3 seconds
     long waiting = (long)((3 - loading_time) * 1e9);
     if (waiting > 0) svcSleepThread(waiting);
+    loading_screen_update(100);
 
     // Set to known value
     change_blending(false);
