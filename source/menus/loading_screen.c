@@ -38,7 +38,10 @@ char *splash_texts[] = {
     "You wouldnt steal a geometry dash",
     "Free and Open Source!",
     "2.0 Coming never!",
-    "Wiidash is dead"
+    "Wiidash is dead",
+    "Also try Famidash!",
+    "Check out other TFDSoft projects!",
+    "Dont make dumb issues. Please."
 };
 
 #define NUM_SPLASH_TEXTS (sizeof(splash_texts) / sizeof(char *))
