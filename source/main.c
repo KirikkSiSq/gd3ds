@@ -23,6 +23,7 @@
 #include "menus/level_select.h"
 #include "menus/icon_kit.h"
 #include "menus/gameplay.h"
+#include "menus/soggy.h"
 #include "menus/components/ui_screen.h"
 
 #include "player/collision.h"
@@ -1003,6 +1004,9 @@ int main(int argc, char* argv[]) {
                 break;
             case STATE_EXTERNAL_LEVELS:
                 external_levels_loop();
+                break;
+            case STATE_SOGGY: // Sog
+                soggy_menu_loop();
                 break;
             case STATE_EXIT:
                 exit = true;

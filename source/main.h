@@ -61,6 +61,7 @@ enum GameState {
     STATE_SAVED_LEVELS,
     STATE_CREATOR_MENU,
     STATE_SEARCH_MENU,
+    STATE_SOGGY,
     STATE_EXIT
 };
 

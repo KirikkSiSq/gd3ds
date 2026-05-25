@@ -9,7 +9,6 @@
 #include "menus/components/ui_image.h"
 #include "menus/components/ui_progress_bar.h"
 #include "menus/components/ui_label.h"
-#include "menus/components/ui_button.h"
 #include "menus/components/ui_external_level_card.h"
 #include "fonts/bigFont.h"
 #include "main.h"
@@ -26,7 +25,6 @@
 #include "external_levels.h"
 #include "search_menu.h"
 #include "creator_menu.h"
-#include "soggy.h"
 
 #include "gameplay.h"
 
@@ -34,68 +32,34 @@
 #include "utils/folders.h"
 #include "level_loading.h"
 
-static int new_state = 0;
 static bool exit_flag = false;
+
+bool gotSogged = false;
 
 static UIScreen screen;
 static UIScreen screen_top;
-static UIElement *bg_gradient;
-static UIElement *bg_gradient_top;
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
     set_fade_status(FADE_STATUS_OUT);
 }
 
-static void action_open_external_menu(UIElement *e) {
-    new_state = STATE_EXTERNAL_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
-static void action_open_saved_menu(UIElement *e) {
-    new_state = STATE_SAVED_LEVELS;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
-static void action_open_search_menu(UIElement *e) {
-    new_state = STATE_SEARCH_MENU;
-    set_fade_status(FADE_STATUS_OUT);
-}
-
-static void action_open_soggy_menu(UIElement *e) {
-    new_state = STATE_SOGGY;
-    set_fade_status(FADE_STATUS_OUT);
-    playing_menu_loop = false;
-}
-
 static UIAction actions[] = {
     {"exit", action_exit },
-    {"external", action_open_external_menu},
-    {"saved", action_open_saved_menu},
-    {"search", action_open_search_menu},
-    {"create", action_open_soggy_menu},
 };
 
-void creator_menu_loop() {
+void soggy_menu_loop() {
     exit_flag = false;
-    new_state = STATE_CREATOR_MENU;
+    gotSogged = true;
+    cfg_save(); // You got sogged
 
-    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/creator_menu.txt");
-    bg_gradient = ui_get_element_by_tag(&screen, "gradient");
-    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/creator_menu_top.txt");
-    bg_gradient_top = ui_get_element_by_tag(&screen_top, "gradient_top");
-
-    ui_image_set_tint(bg_gradient, C2D_Color32(50, 110, 255, 255));
-    ui_image_set_tint(bg_gradient_top, C2D_Color32(50, 110, 255, 255));
-
-    if (gotSogged) ui_button_set_image(ui_get_element_by_tag(&screen, "create_button"), 20, 1);
+    ui_load_screen(&screen, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/soggy.txt");
+    ui_load_screen(&screen_top, actions, sizeof(actions) / sizeof(actions[0]), "romfs:/menus/soggy_top.txt");
 
     set_fade_status(FADE_STATUS_IN);
 
-    if (!playing_menu_loop) {
-        play_mp3("romfs:/songs/menuLoop.mp3", true, 0);
-        playing_menu_loop = true;
-    }
+    stop_mp3();
+    play_mp3("romfs:/songs/SogLoop.mp3", true, 0);
 
     while (aptMainLoop()) {
         hidScanInput();
@@ -140,12 +104,8 @@ void creator_menu_loop() {
         } while (handle_fading());
 
         if (exit_flag) {
-            game_state = STATE_MAIN_MENU;
-            break;
-        }
-
-        if (new_state != STATE_CREATOR_MENU) {
-            game_state = new_state;
+            stop_mp3();
+            game_state = STATE_CREATOR_MENU;
             break;
         }
     }
