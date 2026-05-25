@@ -1205,9 +1205,9 @@ void set_color_channels() {
                 break;
 
             default:
-                if (id < CHANNEL_P1) {
+                if (!(id > COL_4 && id < CHANNEL_BG) && id < CHANNEL_P1) {
                     int chan = get_col_channel_index(id);
-                    
+
                     memset(&channels[chan], 0, sizeof(ColorChannel));
                     Color color;
                     color.r = colorChannel.fromRed;
