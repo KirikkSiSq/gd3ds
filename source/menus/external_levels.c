@@ -50,6 +50,7 @@ static void open_folder(UIElement *e);
 
 static void action_exit(UIElement *e) {
     exit_flag = true;
+    current_path[0] = '\0'; // Reset it
     set_fade_status(FADE_STATUS_OUT);
 }
 
