@@ -9,7 +9,7 @@
 #define USE_EFFECT_OBJ_P1 -1
 
 // Stupid hack lmao
-#define GFX_TOP_BUT_ABOVE_LEVEL (GFX_BOTTOM+1)
+#define GFX_TOP_BUT_ABOVE_LEVEL (2)
 
 typedef struct {
     float duration;

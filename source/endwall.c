@@ -85,7 +85,7 @@ bool handle_wall_cutscene(float delta) {
             circunference_timer = 0.0f;
 
             // Endwall circle
-            UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_second, GFX_TOP_BUT_ABOVE_LEVEL);
+            UseEffect *effect = add_use_effect(level_info.wall_x, level_info.wall_y, USE_EFFECT_OBJ_NOTHING, &end_wall_filled_second, GFX_TOP);
             if (effect) {
                 Color p1_white = get_white_if_black(p1_color);
                 effect->def.colorR = p1_white.r / 255.f;
@@ -107,7 +107,7 @@ bool handle_wall_cutscene(float delta) {
             float calc_x = state.camera_x + 100 + random_float(0, SCREEN_WIDTH_AREA - 200);
             float y = random_float(0, SCREEN_HEIGHT_AREA);
             float calc_y = state.camera_y + (SCREEN_HEIGHT - y);
-            UseEffect *effect = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_firework_circle, GFX_TOP);
+            UseEffect *effect = add_use_effect(calc_x, calc_y, USE_EFFECT_OBJ_NOTHING, &end_wall_firework_circle, GFX_TOP_BUT_ABOVE_LEVEL);
             if (effect) {
                 Color p2_white = get_white_if_black(p2_color);
                 effect->def.colorR = p2_white.r / 255.f;

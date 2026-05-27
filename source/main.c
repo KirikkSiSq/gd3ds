@@ -698,6 +698,7 @@ void game_loop() {
             end_wall_particles.emitting = level_info.wall_y > 0;
 
             update_use_effects(delta, GFX_TOP);
+            update_use_effects(delta, GFX_TOP_BUT_ABOVE_LEVEL);
             update_object_particles(delta);
             u64 end_part = svcGetSystemTick();
             u64 ticks_part = end_part - start_part;

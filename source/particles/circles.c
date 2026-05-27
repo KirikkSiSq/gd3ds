@@ -379,7 +379,7 @@ void draw_use_effects(int screen) {
             float opacity = 1.f;
 
             // If stationary, dont convert to screen space
-            if (screen == GFX_TOP) {
+            if (screen != GFX_BOTTOM) {
                 // If obj is positive, it is an object, else it is a player
                 if (effect->obj >= 0) { // Obj
                     float tmp_x = (x - state.camera_x);
