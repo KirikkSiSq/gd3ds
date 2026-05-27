@@ -65,6 +65,11 @@ static bool parse_color_tag(const char *tag, u32 *out) {
     if(parse_named_color_tag(tag, out))
         return true;
 
+    if (strcmp(tag, "/") == 0) {
+        *out = white;
+        return true;
+    }
+
     // Hex color
     if (tag[0] == '#') {
         return parse_hex_color(tag, out);
