@@ -62,6 +62,12 @@ void update_object_particles(float dt) {
     remove_offscreen_object_particles();
     for (size_t i = 0; i < MAX_OBJECT_PS; i++) {
         if (object_particle[i].occupied) {
+            
+            int obj = object_particle[i].id;
+            if (objects.toggled[obj]) {
+                object_particle[i].ps.emitting = false;
+            }
+
             updateParticleSystem(&object_particle[i].ps, dt);
         }
     }

@@ -17,6 +17,7 @@
 
 #include "particles/object_particles.h"
 #include "particles/circles.h"
+#include "particles/coin_effect.h"
 
 #include "menus/settings.h"
 #include "menus/gameplay.h"
@@ -410,20 +411,11 @@ int get_glow_channel(int obj) {
     }
     return CHANNEL_OBJ_BLENDING;
 }
-// Spike ground spikes
-const int obj_9_random_layers[4] = {
-    586,
-    590,
-    591,
-    590
-};
-// Bush ground spikes (found in toe)
-const int obj_135_random_layers[4] = {
-    611,
-    612,
-    613,
-    614
-};
+
+int get_coin_texture(int tex) {
+    return tex + ((level_frame >> 5) & 0b11);;
+}
+
 // Some objects have a randomized texture at level load, get those
 int get_obj_random_layer(int obj, int id) {
     int tex = game_objects[id].texture;
@@ -437,6 +429,9 @@ int get_obj_random_layer(int obj, int id) {
             return tex + offset;
         case 135:
             return tex + (objects.random[obj] & 0b11);
+        
+        case SECRET_COIN:
+            return get_coin_texture(tex);
     }
     return -1;
 }
@@ -580,9 +575,11 @@ void spawn_object_at(
         if (random_layer < 0) {
             vo->spr = sprite_templates[id].parent_template;
         } else {
+            int rel_index;
+            C2D_SpriteSheet *sheet = get_sprite_sheet(random_layer, &rel_index);
             C2D_Sprite rnd = { 0 };
             vo->spr = rnd;
-            C2D_SpriteFromSheet(&vo->spr, spriteSheet, random_layer);
+            C2D_SpriteFromSheet(&vo->spr, *sheet, rel_index);
             C2D_SpriteSetCenter(&vo->spr, 0.5f, 0.5f);
         }
 
@@ -1313,6 +1310,10 @@ void draw_objects() {
             
             C2D_DrawSpriteTinted(&obj->spr, &obj->tint);
         } else {   
+            change_blending(false);
+            
+            draw_collect_effect();
+
             change_blending(true);
             draw_use_effects(GFX_TOP);
             if (level_info.wall_y > 0) {
@@ -1336,7 +1337,6 @@ void draw_objects() {
             draw_p1_trail(&state.player, 0);
             if (!noPlayerTrail) MotionTrail_Draw(&trail_p1);
             MotionTrail_DrawWaveTrail(&wave_trail_p1);
-            change_blending(true);
 
             draw_p1_trail(&state.player2, 1);
             

@@ -161,6 +161,8 @@ void spawn_glow_layer_at(
 
 void handle_mirror_transition();
 
+int get_coin_texture(int tex);
+
 void make_opacity_lut();
 float get_opacity(float opacity);
 
