@@ -170,6 +170,14 @@ static UIAction actions_top[] = {
 };
 
 void handle_title_screen_player(Player *player) {
+    if (state.input.holdJump) {
+        if (player->buffering_state == BUFFER_NONE) {
+            player->buffering_state = BUFFER_READY;
+        }
+    } else {
+        player->buffering_state = BUFFER_NONE;
+    }
+    
     player->on_ground = false;
     player->on_ceiling = false;
 
@@ -190,7 +198,6 @@ void handle_title_screen_player(Player *player) {
 }
 
 void reset_players() {
-
     death_wait_timer = 0;
     Color p1 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
     Color p2 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
