@@ -1,4 +1,4 @@
-#include <3ds.h>
+    #include <3ds.h>
 #include <citro2d.h>
 
 #include <stdlib.h>
@@ -37,6 +37,8 @@
 
 static Player title_screen_player;
 static bool title_screen_player_hold = false;
+
+static Color saved_p1;
 
 static int saved_cube;
 static int saved_ship;
@@ -188,6 +190,8 @@ void handle_title_screen_player(Player *player) {
 }
 
 void reset_players() {
+    init_particles();
+
     death_wait_timer = 0;
     Color p1 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
     Color p2 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
@@ -338,8 +342,10 @@ void main_menu_loop() {
     get_buffer(CHANNEL_BG)->active = false;
     get_buffer(CHANNEL_GROUND)->active = false;
     get_buffer(CHANNEL_LINE)->active = false;
+
+    saved_p1 = p1_color;
+    allocate_particles();
     init_variables();
-    init_particles();
     reset_players();
 
     state.current_player = 0;
@@ -471,7 +477,11 @@ void main_menu_loop() {
         if (!in_settings && !in_credits && !in_statistics && !in_first_boot_disclaimer && !in_info_card) ui_screen_update(&screen, &touch);
         ui_screen_update(&screen_top, &touch);
         do {
+            Color p1 = p1_color;
+            p1_color = saved_p1;
             update_touch_effect(DT);
+            p1_color = p1;
+            
             bg_scroll += 5.19300155f;
             C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
             
@@ -482,6 +492,7 @@ void main_menu_loop() {
 
             draw_background(-40 + (bg_scroll / 8), 0);
             C2D_ViewScale(SCALE, SCALE);
+            state.camera_x = -((SCREEN_WIDTH_AREA - SCREEN_WIDTH_AREA_BOT)/2);
             state.camera_y = SCREEN_HEIGHT_AREA;
 
             draw_player_effects();
@@ -500,6 +511,7 @@ void main_menu_loop() {
 
             draw_background(bg_scroll / 8, SCREEN_HEIGHT);
             C2D_ViewScale(SCALE, SCALE);
+            state.camera_x = 0;
             state.camera_y = 0;
             draw_player_effects();
             change_blending(true);
@@ -585,6 +597,7 @@ void main_menu_loop() {
             selected_wave = saved_wave;
 
             game_state = new_state;
+            free_particles();
             break;
         }
     }

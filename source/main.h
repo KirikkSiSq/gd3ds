@@ -81,6 +81,8 @@ extern SFX quit_sound;
 extern SFX explode_sound;
 extern SFX end_sound;
 
+void allocate_particles();
+void free_particles();
 void init_particles();
 void update_player_effects(float delta);
 

@@ -198,7 +198,7 @@ void update_player_effects(float delta) {
     updateParticleSystem(&coin_pickup_particles, delta);
 }
 
-void init_particles() {
+void allocate_particles() {
     initParticleSystem(&drag_particles[0], &drag_effect);
     initParticleSystem(&drag_particles[1], &drag_effect);
 
@@ -235,7 +235,35 @@ void init_particles() {
     initParticleSystem(&end_wall_firework, &firework);
     initParticleSystem(&level_complete_effect_p1, &level_complete_01);
     initParticleSystem(&level_complete_effect_p2, &level_complete_01);
-    
+}
+
+void free_particles() {
+    for (int i = 0; i < 2; i++) {
+        freeParticleData(&drag_particles[i].data);
+        freeParticleData(&drag_particles_2[i].data);
+        freeParticleData(&ship_fire_particles[i].data);
+        freeParticleData(&secondary_particles[i].data);
+        freeParticleData(&ship_secondary_particles[i].data);
+        freeParticleData(&burst_particles[i].data);
+        freeParticleData(&land_particles[i].data);
+        freeParticleData(&explosion_particles[i].data);
+    }
+
+    freeParticleData(&brick_destroy_particles.data);
+    freeParticleData(&glitter_particles.data);
+    freeParticleData(&slow_speed_particles.data);
+    freeParticleData(&normal_speed_particles.data);
+    freeParticleData(&fast_speed_particles.data);
+    freeParticleData(&faster_speed_particles.data);
+    freeParticleData(&coin_pickup_particles.data);
+
+    freeParticleData(&end_wall_particles.data);
+    freeParticleData(&end_wall_firework.data);
+    freeParticleData(&level_complete_effect_p1.data);
+    freeParticleData(&level_complete_effect_p2.data);
+}
+
+void init_particles() {    
     slow_speed_particles.stationary = true;
     normal_speed_particles.stationary = true;
     fast_speed_particles.stationary = true;
@@ -283,14 +311,14 @@ void init_particles() {
     secondary_particles[0].cfg.startColorBlue  = p2_not_white.b / 255.f;
     secondary_particles[0].cfg.finishColorAlpha = 1.f;
     secondary_particles[0].cfg.maxParticles = 15;
-    secondary_particles[0].cfg.speed -= 30;
+    secondary_particles[0].cfg.speed = 75 - 30;
 
     secondary_particles[1].cfg.startColorRed   = p1_not_white.r / 255.f;
     secondary_particles[1].cfg.startColorGreen = p1_not_white.g / 255.f;
     secondary_particles[1].cfg.startColorBlue  = p1_not_white.b / 255.f;
     secondary_particles[1].cfg.finishColorAlpha = 1.f;
     secondary_particles[1].cfg.maxParticles = 15;
-    secondary_particles[1].cfg.speed -= 30;
+    secondary_particles[1].cfg.speed = 75 - 30;
 
     ship_secondary_particles[0].cfg.startColorRed   = 255.f/ 255.f;
     ship_secondary_particles[0].cfg.startColorGreen = 70.f / 255.f;
@@ -310,7 +338,7 @@ void init_particles() {
     ship_fire_particles[0].cfg.finishColorGreen = 65.f / 255.f;
     ship_fire_particles[0].cfg.finishColorBlue  = 0.f / 255.f;
 
-    ship_fire_particles[0].cfg.speed -= 30;
+    ship_fire_particles[0].cfg.speed = 75 - 30;
     ship_fire_particles[0].cfg.maxRadius = 130;
     ship_fire_particles[1].cfg = ship_fire_particles[0].cfg;
 
@@ -449,6 +477,7 @@ void game_loop() {
     gameplay_screen_init();
     
     // Particle
+    allocate_particles();
     init_particles();
 
     exiting_level = false;
@@ -905,24 +934,7 @@ void game_loop() {
         }
     }
 
-    for (int i = 0; i < 2; i++) {
-        freeParticleData(&drag_particles[i].data);
-        freeParticleData(&drag_particles_2[i].data);
-        freeParticleData(&ship_fire_particles[i].data);
-        freeParticleData(&secondary_particles[i].data);
-        freeParticleData(&ship_secondary_particles[i].data);
-        freeParticleData(&burst_particles[i].data);
-        freeParticleData(&land_particles[i].data);
-        freeParticleData(&explosion_particles[i].data);
-    }
-
-    freeParticleData(&brick_destroy_particles.data);
-    freeParticleData(&glitter_particles.data);
-    freeParticleData(&slow_speed_particles.data);
-    freeParticleData(&normal_speed_particles.data);
-    freeParticleData(&fast_speed_particles.data);
-    freeParticleData(&faster_speed_particles.data);
-    freeParticleData(&coin_pickup_particles.data);
+    free_particles();
 
     unload_level();
 
