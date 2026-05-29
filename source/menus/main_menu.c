@@ -190,7 +190,6 @@ void handle_title_screen_player(Player *player) {
 }
 
 void reset_players() {
-    init_particles();
 
     death_wait_timer = 0;
     Color p1 = get_color_abgr8(colors[random_int(0, NUM_COLORS - 1)]);
@@ -210,6 +209,7 @@ void reset_players() {
     selected_ufo  = random_int(1, ICON_COUNT_BIRD - 1);
     selected_wave = random_int(1, ICON_COUNT_DART - 1);
 
+    init_particles();
     init_trails();
     init_state();
     level_info.wall_x = 9999999999999999999.f;
